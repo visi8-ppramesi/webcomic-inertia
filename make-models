@@ -1,0 +1,10 @@
+#!/bin/sh
+php artisan make:model Author -mcr
+php artisan make:model Chapter -mcr
+php artisan make:model Comic -mcr
+php artisan make:model Page -mcr
+php artisan make:model Setting -mcr
+php artisan make:model TokenTransaction -mcr
+php artisan make:model Tag -mcr
+php artisan make:model Genre -mcr
+php artisan make:migration create_authors_comics_table --create authors_comics
