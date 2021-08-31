@@ -33,6 +33,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
+        'total_tokens',
+        'read_history',
+        'subscriptions',
+        'favorites',
+        'bookmark',
+        'purchase_history'
     ];
 
     /**
@@ -65,6 +71,16 @@ class User extends Authenticatable implements MustVerifyEmail
         'profile_photo_url',
     ];
 
+    public function readComic($comicId){
+        $history = json_decode($this->read_history, true);
+
+        if(!in_array($comicId, $history)){
+            $history[] = $comicId;
+            $this->read_history = $history;
+            $this->save();
+        }
+    }
+
     public function tokenTransactions(){
         return $this->hasMany(TokenTransaction::class);
     }
@@ -89,7 +105,7 @@ class User extends Authenticatable implements MustVerifyEmail
         });
         $currentToken = $this->total_tokens - $tokenAmount;
         if($currentToken <= 0){
-            return;
+            return false;
         }
 
         $descriptor = [
@@ -99,7 +115,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'item_prices' => $itemsPrices
         ];
 
-        TokenTransaction::create([
+        $transaction = TokenTransaction::create([
             'user_id' => $this->id,
             'token_amount' => $tokenAmount,
             'descriptor' => $descriptor
@@ -111,13 +127,16 @@ class User extends Authenticatable implements MustVerifyEmail
         $jsonString = 'purchase_history->' . $comicId;
         if(array_key_exists($comicId, $currentPurchaseObj)){
             $currentChapter = $currentPurchaseObj[$comicId]['chapters'];
+            $currentTransaction = $currentPurchaseObj[$comicId]['transactions'];
             $currentChapter = array_merge($currentChapter, $chapters);
+            $transactions = array_merge($currentTransaction, [$transaction->id]);
             $purchaseObject = [
                 'price' => $comicObj->price,
                 'ar' => $ar,
                 'id' => $comicId,
                 'date' => now(),
-                'chapters' => $currentChapter
+                'chapters' => $currentChapter,
+                'transactions' => $transactions
             ];
         }else{
             $purchaseObject = [
@@ -125,7 +144,8 @@ class User extends Authenticatable implements MustVerifyEmail
                 'ar' => $ar,
                 'id' => $comicId,
                 'date' => now(),
-                'chapters' => $chapters
+                'chapters' => $chapters,
+                'transactions' => [$transaction->id]
             ];
         }
         $uid = $this->id;
@@ -133,6 +153,17 @@ class User extends Authenticatable implements MustVerifyEmail
             $jsonString => $purchaseObject,
             'total_tokens' => $currentToken
         ]);
+    }
+
+    public function subscribeComic($comicId){
+        $currentFave = json_decode($this->subscriptions, true);
+        if(in_array($comicId, $currentFave)){
+            $currentFave[] = $comicId;
+        }else{
+            $currentFave = array_values(array_diff($currentFave, [$comicId]));
+        }
+        $uid = $this->id;
+        return self::where('id', $uid)->update(['subscriptions' => $currentFave]);
     }
 
     public function bookmarkPage($chapterId){
@@ -143,12 +174,20 @@ class User extends Authenticatable implements MustVerifyEmail
         return self::where('id', $uid)->update(['bookmark' => $currentBookmark]);
     }
 
-    public function toggleFavoriteComic($comicId){
-        $currentFave = json_decode($this->favorites);
-        if(in_array($comicId, $currentFave)){
-            $currentFave[] = $comicId;
+    public function toggleFavoriteComic($objectId, $type = 'comic'){
+        /*
+            structure should be:
+            {
+                comic: [1,2,3...],
+                chapter: [2,3,4...]
+            }
+            so initialized to {comic:[], chapter: []}
+        */
+        $currentFave = json_decode($this->favorites, true);
+        if(in_array($objectId, $currentFave[$type])){
+            $currentFave[$type][] = $objectId;
         }else{
-            $currentFave = array_values(array_diff($currentFave, [$comicId]));
+            $currentFave[$type] = array_values(array_diff($currentFave[$type], [$objectId]));
         }
         $uid = $this->id;
         return self::where('id', $uid)->update(['favorites' => $currentFave]);

@@ -63,3 +63,13 @@ Route::middleware('auth:sanctum')->group(function(){
 Route::middleware('role:visitor')->group(function(){
 
 });
+
+// Route::post('/register', [AuthController::class, 'register'])->name('api.register');
+// Route::post('/login', [AuthController::class, 'login'])->name('api.login');
+
+Route::get('/comics', [ComicController::class, 'index'])->name('api.comics.list');
+
+// Route::get('/pages', [PageController::class, 'index'])->name('api.');
+
+Route::get('/author/{author}', [AuthorController::class, 'show'])->name('api.author.show');
+Route::get('/authors', [AuthorController::class, 'index'])->name('api.authors.list');

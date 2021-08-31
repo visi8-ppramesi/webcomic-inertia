@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Filters\Get;
 use App\Traits\Pipeable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

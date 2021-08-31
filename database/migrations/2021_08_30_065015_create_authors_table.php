@@ -20,6 +20,7 @@ class CreateAuthorsTable extends Migration
             $table->json('social_media_links')->nullable();
             $table->string('email');
             $table->string('profile_picture_url');
+            $table->foreignId('user_id');
             $table->timestamps();
         });
     }

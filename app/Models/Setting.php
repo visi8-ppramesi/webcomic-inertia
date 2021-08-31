@@ -9,4 +9,17 @@ class Setting extends Model
 {
     use HasFactory;
     protected $guarded = [];
+
+    public static function getValue($name){
+        return json_decode(self::where('name', $name)->first()->values, true);
+    }
+
+    public static function getValues($names){
+        $settingsArr = Setting::whereIn('name', $names)->get()->map->only('values', 'name');
+        $retVal = [];
+        foreach($settingsArr->all() as $idx => $val){
+            $retVal[$val['name']] = json_decode($val['values'], true);
+        }
+        return $retVal;
+    }
 }
