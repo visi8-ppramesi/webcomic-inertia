@@ -16,9 +16,10 @@ class CreateTokenTransactionsTable extends Migration
         Schema::create('token_transactions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
+            $table->nullableMorphs('transactionable');
             $table->integer('token_amount');
-            $table->float('money_value');
-            $table->json('description');
+            // $table->float('money_value')->nullable();
+            $table->json('descriptor');
             $table->timestamps();
         });
     }

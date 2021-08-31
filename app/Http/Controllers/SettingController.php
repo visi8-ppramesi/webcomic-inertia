@@ -35,7 +35,7 @@ class SettingController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
     }
 
     /**
@@ -46,7 +46,7 @@ class SettingController extends Controller
      */
     public function show(Setting $setting)
     {
-        //
+        return response()->json($setting, 200);
     }
 
     /**

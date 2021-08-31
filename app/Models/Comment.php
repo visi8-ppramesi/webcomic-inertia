@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use tizis\laraComments\Entity\Comment as laraComment;
 
-class Tag extends Model
+class Comment extends laraComment
 {
     use HasFactory;
-    protected $guarded = [];
 }

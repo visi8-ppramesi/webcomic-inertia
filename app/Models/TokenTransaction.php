@@ -8,4 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 class TokenTransaction extends Model
 {
     use HasFactory;
+    protected $guarded = [];
+
+    public function transactionable(){
+        return $this->morphTo();
+    }
+
+    public function user(){
+        return $this->belongsTo(User::class);
+    }
 }
