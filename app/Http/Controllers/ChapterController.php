@@ -7,6 +7,33 @@ use Illuminate\Http\Request;
 
 class ChapterController extends Controller
 {
+    public function purchaseChapter(Request $request){
+        $validated = $request->validate([
+            'ar' => ['boolean', 'required'],
+            'chapter' => ['integer', 'required']
+        ]);
+        $cpt = Chapter::find($validated['chapter']);
+        $cpt->comic->id;
+        $u = auth()->user();
+        if($validated['ar']){
+            $ar = [$validated['chapter'] => true];
+        }else{
+            $ar = [];
+        }
+        $purchased = $u->purchaseChapters($cpt->comic->id, [$validated['chapter']], $ar);
+        return response()->json(['status' => $purchased], 200);
+    }
+
+    public function checkAr(Chapter $chapter){
+        $chapter->load('pages');
+        $retVal = false;
+        $pages = $chapter->pages->map(function($val, $idx)use(&$retVal){
+            $retVal = $retVal || !empty($val->scene);
+        });
+
+        return response()->json($retVal, 200);
+    }
+
     /**
      * Display a listing of the resource.
      *

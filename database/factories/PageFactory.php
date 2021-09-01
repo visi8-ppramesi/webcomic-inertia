@@ -22,14 +22,14 @@ class PageFactory extends Factory
      */
     public function definition()
     {
-        $comic = Comic::inRandomOrder()->first();
-        $chapter = $comic->chapters->random()->id;
+        $comic = Comic::with('chapters')->inRandomOrder()->first();
+        $chapter = $comic->chapters->random();
         return [
             'section' => $this->faker->randomDigit(),
             'image_url' => '/storage/media/comics/pg1.jpg',
             'config' => 'tbd',
             'comic_id' => $comic->id,
-            'chapter_id' => $chapter
+            'chapter_id' => $chapter->id
         ];
     }
 }

@@ -30,53 +30,24 @@ Route::get('/', function () {
 // })->name('dashboard');
 
 Route::get('/', [ViewController::class, 'viewDashboard'])->name('web.dashboard');
+Route::middleware('auth:sanctum')->group(function(){
+    Route::get('/comic/{comic}', [ViewController::class, 'viewComicShow'])->name('web.comic');
+    Route::get('/page/{comic}/{chapter}', [ViewController::class, 'viewPageShow'])->name('web.page');
+});
 
-Route::get('/about', function () {
-    return Inertia::render('About');
-})->name('web.aboutus');
+Route::get('/about', [ViewController::class, 'viewAboutShow'])->name('web.aboutus');
+Route::get('/scene/{page}', [ViewController::class, 'viewSceneShow'])->name('web.scene');
+Route::get('/search', [ViewController::class, 'viewSearchShow'])->name('web.search');
+Route::get('/author/{author}', [ViewController::class, 'viewAuthorShow'])->name('web.author');
+Route::get('/payment', [ViewController::class, 'viewPaymentShow'])->name('web.payment');
+Route::get('/mycomic', [ViewController::class, 'viewMyComicShow'])->name('web.mycomic');
+Route::get('/account', [ViewController::class, 'viewAccountShow'])->name('web.account');
+Route::get('/privacy', [ViewController::class, 'viewPrivacyShow'])->name('web.privacypolicy');
 
-Route::get('/scene/{page}', function () {
-    return Inertia::render('SceneShow');
-})->name('web.sceneshow');
-
-Route::get('/search', function () {
-    return Inertia::render('Search');
-})->name('web.search');
-
-Route::get('/comic/{comic}', function () {
-    return Inertia::render('ComicShow');
-})->name('web.comicshow');
-
-Route::get('/page/{comic}/{chapter}', function () {
-    return Inertia::render('PageShow');
-})->name('web.pageshow');
-
-Route::get('/author/{author}', function () {
-    return Inertia::render('AuthorShow');
-})->name('web.authorshow');
-
-Route::get('/payment', function () {
-    return Inertia::render('Payment');
-})->name('web.payment');
-
-Route::get('/mycomic', function () {
-    return Inertia::render('MyComic');
-})->name('web.mycomic');
-
-Route::get('/account', function () {
-    return Inertia::render('Account');
-})->name('web.account');
-
-Route::get('/privacy', function () {
-    return Inertia::render('Privacy');
-})->name('web.privacypolicy');
-
-Route::get('/404', function () {
-    return Inertia::render('NotFound');
-})->name('web.notfound');
+// Route::get('/404', [ViewController::class, 'view404Show'])->name('web.notfound');
 
 // Route::get('/register', function () {
-//     return Inertia::render('Auth/Register');
+//   return Inertia::render('Auth/Register');
 // })->name('web.register');
 
 // Route::get('/login', function () {

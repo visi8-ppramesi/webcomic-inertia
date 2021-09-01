@@ -34,7 +34,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/page/bookmark/{pageId}', [PageController::class, 'bookmarkPage'])->name('api.page.bookmark');
 
     Route::get('/pages/{comicId}/{chapter}/', [PageController::class, 'getComicPages'])->name('api.pages.show');
-    Route::get('/page/scene/{page}', [PageController::class, 'getPageScene'])->name('api.page.show.scene');
+    Route::get('/scene/{page}', [PageController::class, 'getPageScene'])->name('api.page.show.scene');
 
     Route::get('/comic/{comic}', [ComicController::class, 'show'])->name('api.comic.show');
     Route::patch('/comic/{comic}', [ComicController::class, 'update'])->name('api.comic.update');
@@ -57,7 +57,12 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/comic/bookmark/check/{comicId}', [ComicController::class, 'checkBookmarked'])->name('api.comic.check.bookmark');
     Route::get('/comic/purchased/check/{comicId}', [ComicController::class, 'checkPurchased'])->name('api.comic.check.purchased');
     Route::post('/comics/purchase', [ComicController::class, 'purchaseComics'])->name('api.comics.purchase');
+    Route::post('/chapter/purchase', [ChapterController::class, 'purchaseChapter'])->name('api.chapter.purchase');
     Route::get('/previews/{comicId}', [ChapterController::class, 'index'])->name('api.comic.get.previews');
+});
+
+Route::get('/test', function(){
+    return auth()->user();
 });
 
 Route::middleware('role:visitor')->group(function(){
@@ -73,3 +78,4 @@ Route::get('/comics', [ComicController::class, 'index'])->name('api.comics.list'
 
 Route::get('/author/{author}', [AuthorController::class, 'show'])->name('api.author.show');
 Route::get('/authors', [AuthorController::class, 'index'])->name('api.authors.list');
+Route::get('/chapter/checkar/{chapter}', [ChapterController::class, 'checkAr'])->name('api.chapter.check.ar');

@@ -7,11 +7,11 @@
                 </router-link>
             </div> -->
 
-            <router-link :to="item.url">
+            <Link :href="item.url">
                 <div class="text-sm p-2 image scroller-block text-white flex flex-col justify-end" :style="'background-image:linear-gradient(to bottom, rgba(245, 246, 252, 0), rgb(0 0 0 / 73%)), url(' + item[config.image] + ');'">
                     {{item[config.title]}}
                 </div>
-            </router-link>
+            </Link>
         </div>
         <div v-if="items.nextPageUrl" class="bg-green-500 w-20 px-5 flex justify-center items-center rounded-lg text-center" @click="loadMore">load more</div>
     </div>

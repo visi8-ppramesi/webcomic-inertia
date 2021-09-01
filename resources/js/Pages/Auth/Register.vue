@@ -1,32 +1,22 @@
 <template>
-    <Head title="Register" />
-
     <jet-authentication-card>
-        <template #logo>
-            <jet-authentication-card-logo />
-        </template>
-
         <jet-validation-errors class="mb-4" />
 
         <form @submit.prevent="submit">
             <div>
-                <jet-label for="name" value="Name" />
-                <jet-input id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus autocomplete="name" />
+                <jet-input placeholder="Name" id="name" type="text" class="shadow appearance-none border rounded-full w-full py-2 px-3 text-grey-darker" v-model="form.name" required autofocus autocomplete="name" />
             </div>
 
             <div class="mt-4">
-                <jet-label for="email" value="Email" />
-                <jet-input id="email" type="email" class="mt-1 block w-full" v-model="form.email" required />
+                <jet-input placeholder="Email" id="email" type="email" class="shadow appearance-none border rounded-full w-full py-2 px-3 text-grey-darker" v-model="form.email" required />
             </div>
 
             <div class="mt-4">
-                <jet-label for="password" value="Password" />
-                <jet-input id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="new-password" />
+                <jet-input placeholder="Password" id="password" type="password" class="shadow appearance-none border rounded-full w-full py-2 px-3 text-grey-darker" v-model="form.password" required autocomplete="new-password" />
             </div>
 
             <div class="mt-4">
-                <jet-label for="password_confirmation" value="Confirm Password" />
-                <jet-input id="password_confirmation" type="password" class="mt-1 block w-full" v-model="form.password_confirmation" required autocomplete="new-password" />
+                <jet-input placeholder="Confirm Password" id="password_confirmation" type="password" class="shadow appearance-none border rounded-full w-full py-2 px-3 text-grey-darker" v-model="form.password_confirmation" required autocomplete="new-password" />
             </div>
 
             <div class="mt-4" v-if="$page.props.jetstream.hasTermsAndPrivacyPolicyFeature">
@@ -34,7 +24,7 @@
                     <div class="flex items-center">
                         <jet-checkbox name="terms" id="terms" v-model:checked="form.terms" />
 
-                        <div class="ml-2">
+                        <div class="ml-2 text-white">
                             I agree to the <a target="_blank" :href="route('terms.show')" class="underline text-sm text-gray-600 hover:text-gray-900">Terms of Service</a> and <a target="_blank" :href="route('policy.show')" class="underline text-sm text-gray-600 hover:text-gray-900">Privacy Policy</a>
                         </div>
                     </div>
@@ -42,7 +32,7 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
+                <Link :href="route('login')" class="text-white underline text-sm text-gray-600 hover:text-gray-900">
                     Already registered?
                 </Link>
 

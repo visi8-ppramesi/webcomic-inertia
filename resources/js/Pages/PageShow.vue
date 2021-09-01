@@ -51,11 +51,13 @@
 import AppLayout from '@/Layouts/AppLayout.vue'
 export default {
     name:'page',
+    props: ['chapter'],
+    props: ['pages', 'ar'],
     data(){
         return {
-            pages: [],
+            // pages: [],
             chapters: [],
-            selectedChapter: this.$route.params.chapter,
+            selectedChapter: 1,
             prevEnabled: false,
             nextEnabled: false,
             scenePages: {},
@@ -98,20 +100,20 @@ export default {
 
             })
         },
-        fetchPages(comicId, chapter){
-            return axios.get(route('api.pages.show', {
-                comicId: comicId,
-                chapter: chapter
-            }))
-            .then((response) => {
-                this.pages = response.data
-                return response
-            })
-            .catch((error) => {
+        // fetchPages(comicId, chapter){
+        //     return axios.get(route('api.pages.show', {
+        //         comicId: comicId,
+        //         chapter: chapter
+        //     }))
+        //     .then((response) => {
+        //         this.pages = response.data
+        //         return response
+        //     })
+        //     .catch((error) => {
 
-            })
+        //     })
 
-        },
+        // },
         handleScroll(e){
             if(!this.isAr){
                 return
@@ -146,36 +148,37 @@ export default {
         // window.addEventListener('scroll', this.handleScroll)
     },
     created(){
-        this.isAr = this.$route.query.ar
-        axios.get(route('api.author.show', {author:1}))
-        this.fetchChapters(this.$route.params.comicId)
-        .then((resp) => {
-            this.prevEnabled = this.$route.params.chapter != this.chapters[0]
-            this.nextEnabled = this.$route.params.chapter != this.chapters[this.chapters.length - 1]
-        })
-        this.fetchPages(this.$route.params.comicId, this.$route.params.chapter)
-        .then((resp) => {
-            let k = {}
-            this.pages.filter((el) => {
-                return !!el.scene
-            }).forEach((el) => {
-                k[el.id] = el.scene
-            })
-            this.scenePages = k
+        this.isAr = this.ar === 'true'
+        // this.isAr = this.$route.query.ar
+        // axios.get(route('api.author.show', {author:1}))
+        // this.fetchChapters(this.$route.params.comicId)
+        // .then((resp) => {
+        //     this.prevEnabled = this.$route.params.chapter != this.chapters[0]
+        //     this.nextEnabled = this.$route.params.chapter != this.chapters[this.chapters.length - 1]
+        // })
+        // this.fetchPages(this.$route.params.comicId, this.$route.params.chapter)
+        // .then((resp) => {
+        //     let k = {}
+        //     this.pages.filter((el) => {
+        //         return !!el.scene
+        //     }).forEach((el) => {
+        //         k[el.id] = el.scene
+        //     })
+        //     this.scenePages = k
 
-            this.$nextTick(() => {
-                let elems = {}
-                Object.keys(this.scenePages).forEach((el) => {
-                    elems[el] = document.getElementById('ar-' + el)
-                })
-                this.arElems = elems
-                this.handleScroll()
-                window.addEventListener('scroll', this.handleScroll)
-            })
-        })
-        .then((resp) => {
-            return axios.get(route('api.page.bookmark', {pageId: this.pages[0].id}))
-        })
+        //     this.$nextTick(() => {
+        //         let elems = {}
+        //         Object.keys(this.scenePages).forEach((el) => {
+        //             elems[el] = document.getElementById('ar-' + el)
+        //         })
+        //         this.arElems = elems
+        //         this.handleScroll()
+        //         window.addEventListener('scroll', this.handleScroll)
+        //     })
+        // })
+        // .then((resp) => {
+        //     return axios.get(route('api.page.bookmark', {pageId: this.pages[0].id}))
+        // })
     },
 }
 </script>

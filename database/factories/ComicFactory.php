@@ -4,6 +4,8 @@ namespace Database\Factories;
 
 use App\Models\Author;
 use App\Models\Comic;
+use App\Models\Genre;
+use App\Models\Tag;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ComicFactory extends Factory
@@ -23,8 +25,8 @@ class ComicFactory extends Factory
     public function definition()
     {
         $author = Author::inRandomOrder()->first();
-        $genres = explode(' ', 'quisque tincidunt ornare nisl Nunc mattis nibh libero');
-        $tags = explode(' ', 'lorem ipsum dolor sit amet consectetur adipiscing elit');
+        $genres = Genre::all()->pluck('name')->toArray();
+        $tags = Tag::all()->pluck('name')->toArray();
         $randomKeys = array_rand($tags, 3);
         $tagsStr = json_encode([$tags[$randomKeys[0]], $tags[$randomKeys[1]], $tags[$randomKeys[2]]]);
         $randomKeysGenre = array_rand($genres, 3);

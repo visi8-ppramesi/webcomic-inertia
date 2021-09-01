@@ -19,6 +19,7 @@ class CreateChaptersTable extends Migration
             $table->foreignId('comic_id');
             $table->integer('chapter');
             $table->integer('token_price');
+            $table->integer('token_price_ar')->nullable();
             $table->date('release_date')->nullable();
             $table->timestamps();
         });

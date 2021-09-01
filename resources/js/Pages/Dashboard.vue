@@ -27,7 +27,7 @@
                 <div class="mb-3 text-white" v-for="(tag, idx) in shownTags" :key="'tag-' + idx">
                     <div>
                         <div class="text-white float-right">More</div>
-                        <div></div>
+                        <div>{{tag}}</div>
                     </div>
                     <div>
                         <horizontal-slider
@@ -62,13 +62,16 @@
 <script>
 import HorizontalSlider from '../Components/HorizontalSlider.vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
+import { usePage } from '@inertiajs/inertia-vue3'
 export default {
     name: 'dashboard',
     components: {
         HorizontalSlider,
         AppLayout,
     },
+    props: ['tags', 'genres', 'banners'],
     created(){
+        this.shownTags = usePage().props.value.tags
         this.shownTags.forEach((elem) => {
             this.comics[elem] = {}
             this.comics[elem].comics = []

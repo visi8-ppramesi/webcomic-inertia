@@ -90,12 +90,18 @@ class User extends Authenticatable implements MustVerifyEmail
         return empty($purchaseHistory[$comicId]) ? [] : $purchaseHistory[$comicId];
     }
 
+    public function checkChapterPurchased($chapterId){
+        $comic = Chapter::find($chapterId)->comic->id;
+        $purchaseHistory = json_decode($this->purchase_history, true);
+        return !empty($purchaseHistory[$comic]) && in_array($chapterId, $purchaseHistory[$comic]['chapters']);
+    }
+
     public function getPurchasedComics(){
         $purchasedId = collect(json_decode($this->purchase_history))->keys()->toArray();
         return Comic::whereIn('id', $purchasedId)->get();
     }
 
-    public function purchaseChapter($comicId, $chapters, $ar = []){//to be called after sucessful payment
+    public function purchaseChapters($comicId, $chapters, $ar = []){//to be called after sucessful payment
         //create token transaction first
         $itemsPrices = [];
         $tokenAmount = 0;
@@ -104,8 +110,11 @@ class User extends Authenticatable implements MustVerifyEmail
             $tokenAmount += $item->token_price;
         });
         $currentToken = $this->total_tokens - $tokenAmount;
+        if($this->checkChapterPurchased($chapters[0])){
+            return -1;
+        }
         if($currentToken <= 0){
-            return false;
+            return 0;
         }
 
         $descriptor = [
@@ -118,7 +127,7 @@ class User extends Authenticatable implements MustVerifyEmail
         $transaction = TokenTransaction::create([
             'user_id' => $this->id,
             'token_amount' => $tokenAmount,
-            'descriptor' => $descriptor
+            'descriptor' => json_encode($descriptor)
         ]);
 
         //then add comic to purchased list
@@ -194,7 +203,8 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     public function getComicBookmarkedPage($comicId){
-        return json_decode($this->bookmark, true)[$comicId];
+        $bookmark = json_decode($this->bookmark, true);
+        return !empty($bookmark[$comicId]) ? $bookmark[$comicId] : [];
     }
 
     public function purchaseToken($tokenAmount, $moneyValue, $paymentType){
@@ -216,7 +226,7 @@ class User extends Authenticatable implements MustVerifyEmail
         TokenTransaction::create([
             'user_id' => $this->id,
             'token_amount' => $tokenAmount,
-            'descriptor' => $descriptor
+            'descriptor' => json_encode($descriptor)
         ]);
         $this->total_tokens += $tokenAmount;
         $this->save();
