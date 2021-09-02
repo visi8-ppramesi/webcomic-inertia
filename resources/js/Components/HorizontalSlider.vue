@@ -46,7 +46,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .scrolling-wrapper{
     display: flex;
     flex-wrap: nowrap;

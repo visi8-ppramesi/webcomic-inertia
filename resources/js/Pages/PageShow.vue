@@ -19,9 +19,9 @@
         </div>
         <template v-for="(page, idx) in pages">
             <div v-if="page.id in scenePages && isAr" :class="{glow: shownClass['ar-' + page.id], 'fill-width': !shownClass['ar-' + page.id]}" class="w-100 glow-animation" :key="'img-' + idx" :id="'ar-' + page.id">
-                <router-link :to="{name: 'sceneShow', params: {pageId: page.id}}">
+                <Link :href="{name: 'sceneShow', params: {pageId: page.id}}">
                     <img class="lg:object-fill lg:w-full" :src="page.image_url">
-                </router-link>
+                </Link>
             </div>
             <div v-else :key="'img-' + idx">
                 <img class="lg:object-fill lg:w-full" :src="page.image_url">
@@ -51,8 +51,7 @@
 import AppLayout from '@/Layouts/AppLayout.vue'
 export default {
     name:'page',
-    props: ['chapter'],
-    props: ['pages', 'ar'],
+    props: ['comic', 'chapter', 'pages', 'ar'],
     data(){
         return {
             // pages: [],
@@ -100,20 +99,19 @@ export default {
 
             })
         },
-        // fetchPages(comicId, chapter){
-        //     return axios.get(route('api.pages.show', {
-        //         comicId: comicId,
-        //         chapter: chapter
-        //     }))
-        //     .then((response) => {
-        //         this.pages = response.data
-        //         return response
-        //     })
-        //     .catch((error) => {
+        fetchPages(comicId, chapter){
+            return axios.get(route('api.pages.show', {
+                comicId: comicId,
+                chapter: chapter
+            }))
+            .then((response) => {
+                this.pages = response.data
+                return response
+            })
+            .catch((error) => {
 
-        //     })
-
-        // },
+            })
+        },
         handleScroll(e){
             if(!this.isAr){
                 return
@@ -156,29 +154,29 @@ export default {
         //     this.prevEnabled = this.$route.params.chapter != this.chapters[0]
         //     this.nextEnabled = this.$route.params.chapter != this.chapters[this.chapters.length - 1]
         // })
-        // this.fetchPages(this.$route.params.comicId, this.$route.params.chapter)
-        // .then((resp) => {
-        //     let k = {}
-        //     this.pages.filter((el) => {
-        //         return !!el.scene
-        //     }).forEach((el) => {
-        //         k[el.id] = el.scene
-        //     })
-        //     this.scenePages = k
+        this.fetchPages(this.comic.id, this.chapter.id)
+        .then((resp) => {
+            let k = {}
+            this.pages.filter((el) => {
+                return !!el.scene
+            }).forEach((el) => {
+                k[el.id] = el.scene
+            })
+            this.scenePages = k
 
-        //     this.$nextTick(() => {
-        //         let elems = {}
-        //         Object.keys(this.scenePages).forEach((el) => {
-        //             elems[el] = document.getElementById('ar-' + el)
-        //         })
-        //         this.arElems = elems
-        //         this.handleScroll()
-        //         window.addEventListener('scroll', this.handleScroll)
-        //     })
-        // })
-        // .then((resp) => {
-        //     return axios.get(route('api.page.bookmark', {pageId: this.pages[0].id}))
-        // })
+            this.$nextTick(() => {
+                let elems = {}
+                Object.keys(this.scenePages).forEach((el) => {
+                    elems[el] = document.getElementById('ar-' + el)
+                })
+                this.arElems = elems
+                this.handleScroll()
+                window.addEventListener('scroll', this.handleScroll)
+            })
+        })
+        .then((resp) => {
+            axios.get(route('api.page.bookmark', {pageId: this.pages[0].id}))
+        })
     },
 }
 </script>

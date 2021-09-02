@@ -40,16 +40,20 @@ class ViewController extends Controller
         ]);
     }
 
-    public function viewPageShow(Comic $comic, Chapter $chapter){
+    public function viewChapterShow(Comic $comic, Chapter $chapter){
         $pages = Page::where('chapter_id', $chapter->id);
-        $param = [
-            'chapter' => $chapter,
-            'pages' => $pages
-        ];
-        if(request()->has('ar')){
-            $param['ar'] = request('ar');
-        };
-        return Inertia::render('PageShow', $param);
+        $u = auth()->user();
+        if($u->checkChapterPurchased($chapter->id)){
+            $param = [
+                'comic' => $comic,
+                'chapter' => $chapter,
+                'pages' => $pages
+            ];
+            if(request()->has('ar')){
+                $param['ar'] = request('ar');
+            };
+            return Inertia::render('PageShow', $param);
+        }
     }
 
     public function viewSceneShow(Page $page){

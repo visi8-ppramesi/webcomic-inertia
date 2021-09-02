@@ -28,7 +28,9 @@
     },
     "dependencies": {
         "mitt": "^3.0.0",
+        "sweetalert2": "^11.1.4",
         "vue3-mq": "^3.0.0",
+        "vueperslides": "^3.3.2",
         "vuex": "^4.0.2"
     }
 }

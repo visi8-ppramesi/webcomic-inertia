@@ -32,7 +32,7 @@ Route::get('/', function () {
 Route::get('/', [ViewController::class, 'viewDashboard'])->name('web.dashboard');
 Route::middleware('auth:sanctum')->group(function(){
     Route::get('/comic/{comic}', [ViewController::class, 'viewComicShow'])->name('web.comic');
-    Route::get('/page/{comic}/{chapter}', [ViewController::class, 'viewPageShow'])->name('web.page');
+    Route::get('/chapter/{comic}/{chapter}', [ViewController::class, 'viewChapterShow'])->name('web.chapter');
 });
 
 Route::get('/about', [ViewController::class, 'viewAboutShow'])->name('web.aboutus');

@@ -4,13 +4,13 @@
             <div class="description-block text-white flex flex-col justify-end p-5" :style="'background-image:linear-gradient(to bottom, rgba(245, 246, 252, 0), rgb(0 0 0 / 73%)), url(' + comic.cover_url + ');'"><!-- top block -->
                 <div>
                     <template v-for="(genre, idx) in genres" :key="'genre-' + idx">
-                        <router-link :to="{name: 'search', query: {search: genre}}">{{genre}}<span v-if="idx < genres.length - 1" :key="'comma-' + idx">, </span></router-link>
+                        <Link :href="{name: 'search', query: {search: genre}}">{{genre}}<span v-if="idx < genres.length - 1" :key="'comma-' + idx">, </span></Link>
                     </template>
                 </div><!-- make it linkable later -->
                 <div class="text-2xl font-bold">{{comic.title}}</div>
                 <div>
                     <template v-for="(author, idx) in authors" :key="'author-' + idx">
-                        <router-link :to="{name: 'authorShow', params: {authorId: author.id}}">{{author.name}}<span v-if="idx < authors.length - 1" :key="'comma-' + idx">, </span></router-link>
+                        <Link :href="{name: 'authorShow', params: {authorId: author.id}}">{{author.name}}<span v-if="idx < authors.length - 1" :key="'comma-' + idx">, </span></Link>
                     </template>
                 </div>
                 <div class="text-sm">{{comic.description}}</div>
@@ -31,7 +31,7 @@
                     <div class="flex-none w-1/5 lg:w-24">
                         <img class="h-20" :src="chapter.image_url" alt="">
                     </div>
-                    <div class="flex-grow flex flex-col p-3 w-2/5 lg:w-2" @click="goToChapter(chapter.chapter)">
+                    <div class="flex-grow flex flex-col p-3 w-2/5 lg:w-2" @click="goToChapter(chapter.id)">
                         <div>Ep. {{chapter.chapter}}</div>
                         <div class="flex flex-row w-100">
                             <div class="mr-2">
@@ -45,7 +45,7 @@
                     <div class="w-2/5 flex justify-end items-end mb-7 mr-5" >
                         <button v-if="checkChapter(purchaseObj.chapters, chapter.id)" class="text-xs items-center min-h-8 w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="openModal(chapter)">Buy Ep. {{chapter.chapter}}</button>
                         <template v-else>
-                            <button class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter.chapter, true)">Read Ep. {{chapter.chapter}} With AR</button>
+                            <button class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter.id, true)">Read Ep. {{chapter.chapter}} With AR</button>
                         </template>
                         <!-- <button @click="openModal(preview.chapter)">Buy Episode</button> -->
                     </div>
@@ -106,6 +106,7 @@ export default {
         AppLayout
     },
     props: ['comic'],
+    inject: ['swal'],
     data(){
         return {
             showArOption: false,
@@ -151,15 +152,26 @@ export default {
             self.modal = false
         })
         this.user = usePage().props.value.user
-        axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
+
+        this.checkPurchased()
         .then((response) => {
             this.purchaseObj = response.data
             this.purchased = Object.keys({...response.data}).length > 0
             return axios.get(route('api.comic.check.bookmark', {comicId: this.comic.id}))
         })
         .then((response) => {
-            this.bookmark = {...response.data}
+            this.bookmark = response.data
         })
+
+        // axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
+        // .then((response) => {
+        //     this.purchaseObj = response.data
+        //     this.purchased = Object.keys({...response.data}).length > 0
+        //     return axios.get(route('api.comic.check.bookmark', {comicId: this.comic.id}))
+        // })
+        // .then((response) => {
+        //     this.bookmark = {...response.data}
+        // })
         // axios.get(route('api.comic.get.previews', {comicId: this.$route.params.comicId}))
         // .then((response) => {
         //     this.previews = response.data
@@ -185,6 +197,9 @@ export default {
         // })
     },
     methods: {
+        checkPurchased(){
+            return axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
+        },
         closeModal(){
             this.modal = false
             this.episodeModal = null
@@ -240,15 +255,16 @@ export default {
             this.$inertia.visit(route('web.payment'))
         },
         startReading(){
-            this.$inertia.visit(route('web.page', {comic: usePage().props.value.comic.id, chapter: this.comic.chapters[0].id, ar: ar}))
+            console.log(this.comic.chapters[0].id)
+            this.$inertia.visit(route('web.chapter', {comic: usePage().props.value.comic.id, chapter: this.comic.chapters[0].id, ar: true}))
             // this.$router.push({name: 'pageShow', params: {
             //     comicId: this.$route.params.comicId,
             //     chapter: this.previews[0].chapter,
             // }})
         },
         continueReading(ar = false){
-            let chapter = this.bookmark.chapter || this.previews[0].chapter
-            this.$inertia.visit(route('web.page', {comic: usePage().props.value.comic.id, chapter: chapter, ar: ar}))
+            let chapter = this.bookmark || this.chapters[0].id
+            this.$inertia.visit(route('web.chapter', {comic: usePage().props.value.comic.id, chapter: chapter, ar: ar}))
             // this.$router.push({name: 'pageShow', params: {
             //     comicId: this.$route.params.comicId,
             //     chapter: chapter
@@ -267,7 +283,9 @@ export default {
 
         },
         goToChapter(chapter, ar = false){
-            this.$inertia.visit(route('web.page', {comic: usePage().props.value.comic.id, chapter: chapter, ar: ar}))
+            if(_.includes(this.purchaseObj.chapters, chapter)){
+                this.$inertia.visit(route('web.chapter', {comic: usePage().props.value.comic.id, chapter: chapter, ar: ar}))
+            }
             // this.$router.push({name: 'pageShow', params: {
             //     comicId: this.$route.params.comicId,
             //     chapter: chapter,
@@ -282,7 +300,44 @@ export default {
                 chapter: this.episodeModal.id
             })
             .then((response) => {
-                let status = response.data
+                let status = response.data.status
+                if(status === 0){
+                    this.modal = false
+                    this.episodeModal = null
+                    this.swal.fire({
+                        icon: "error",
+                        title: "Not Enough Token",
+                        text: "You don't have enough token! Please purchase more tokens!",
+                    });
+                }else if(status === -1){
+                    this.modal = false
+                    this.episodeModal = null
+                    this.swal.fire({
+                        icon: "info",
+                        title: "Already purchased",
+                        text: "Chapter already purchased!",
+                    });
+                }else{
+                    axios.get(route('api.user.check'))
+                    .then((response) => {
+                        this.user = response.data
+                    })
+
+                    this.checkPurchased()
+                    .then((response) => {
+                        this.purchaseObj = response.data
+                        this.purchased = Object.keys({...response.data}).length > 0
+
+                        this.swal.fire({
+                            icon: "success",
+                            title: "Purchase successful!",
+                            text: "Chapter purchased!",
+                        });
+
+                        this.modal = false
+                        this.episodeModal = null
+                    })
+                }
             })
         }
     }

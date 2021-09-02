@@ -17,8 +17,11 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
 Route::middleware('auth:sanctum')->group(function(){
+    Route::get('/checkuser', function(){
+        return response()->json(auth()->user(), 200);
+    })->name('api.user.check');
+
     Route::middleware('role:admin')->group(function(){
 
     });
@@ -59,10 +62,6 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/comics/purchase', [ComicController::class, 'purchaseComics'])->name('api.comics.purchase');
     Route::post('/chapter/purchase', [ChapterController::class, 'purchaseChapter'])->name('api.chapter.purchase');
     Route::get('/previews/{comicId}', [ChapterController::class, 'index'])->name('api.comic.get.previews');
-});
-
-Route::get('/test', function(){
-    return auth()->user();
 });
 
 Route::middleware('role:visitor')->group(function(){

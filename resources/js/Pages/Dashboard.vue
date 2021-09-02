@@ -1,7 +1,13 @@
 <template>
     <app-layout>
         <div class="pa-2 w-full">
-            <div class="flex flex-col justify-end items-center bg-blue-100 w-150 h-40 pb-8 featured-block" style="background-image: linear-gradient(rgba(245, 246, 252, 0) 50%, rgb(49 46 129)), url(/storage/media/covers/kara.jpg);"> <!-- add featured comic here -->
+            <div class="flex flex-col justify-end items-center bg-blue-100 w-150 h-40 featured-block w-full h-screen-navbar sm:h-96">
+                <banner></banner>
+            </div>
+            <div v-if="false" class="flex flex-col justify-end items-center bg-blue-100 w-150 h-40 pb-8 featured-block" style="background-image: linear-gradient(rgba(245, 246, 252, 0) 50%, rgb(49 46 129)), url(/storage/media/covers/kara.jpg);"> <!-- add featured comic here -->
+                <banner
+                    class="w-12"
+                ></banner>
                 <div class="mb-6 text-white">
                     <img class="w-64" :src="karaIcon.default" />
                     <div class="mb-6 text-white">
@@ -25,6 +31,16 @@
                             ></horizontal-slider>
                         </div>
                     </mq-responsive>
+                    <mq-responsive target="md+" tag="span">
+                        <div>
+                            <grid
+                                :items="processToHorizontalSlider(comics.all)"
+                                :config="config"
+                                objectCategory="all"
+                                @nextPage="nextPage"
+                            ></grid>
+                        </div>
+                    </mq-responsive>
                 </div>
                 <div class="mb-3 text-white" v-for="(tag, idx) in shownTags" :key="'tag-' + idx">
                     <div>
@@ -39,6 +55,16 @@
                                 :objectCategory="tag"
                                 @nextPage="nextPage"
                             ></horizontal-slider>
+                        </div>
+                    </mq-responsive>
+                    <mq-responsive target="md+" tag="span">
+                        <div>
+                            <grid
+                                :items="processToHorizontalSlider(comics[tag])"
+                                :config="config"
+                                :objectCategory="tag"
+                                @nextPage="nextPage"
+                            ></grid>
                         </div>
                     </mq-responsive>
                 </div>
@@ -59,6 +85,16 @@
                             ></horizontal-slider>
                         </div>
                     </mq-responsive>
+                    <mq-responsive target="md+" tag="span">
+                        <div>
+                            <grid
+                                :items="processToAuthorHorizontalSlider(authors.all)"
+                                :config="configAuthor"
+                                objectCategory="all"
+                                @nextPage="nextAuthorPage"
+                            ></grid>
+                        </div>
+                    </mq-responsive>
                 </div>
             </div>
         </div>
@@ -67,13 +103,17 @@
 
 <script>
 import HorizontalSlider from '../Components/HorizontalSlider.vue'
+import Grid from '../Components/Grid.vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { usePage } from '@inertiajs/inertia-vue3'
+import Banner from '../Components/Banner.vue'
 export default {
     name: 'dashboard',
     components: {
         HorizontalSlider,
         AppLayout,
+        Banner,
+        Grid,
     },
     props: ['tags', 'genres', 'banners'],
     created(){
@@ -103,7 +143,7 @@ export default {
                 }
             },
             query: {
-                paginate: 8,
+                paginate: 12,
                 page: 1
             },
             config: {
@@ -201,8 +241,11 @@ export default {
     color: #41b3a9;
 }
 .featured-block{
-    height: calc(100vh - 64px);
+    /* height: calc(100vh - 64px); */
     background-size: cover;
     background-position: center;
+}
+.vueperslides, .vueperslides__inner, .vueperslides__parallax-wrapper, .vueperslides__track{
+    height: inherit;
 }
 </style>
