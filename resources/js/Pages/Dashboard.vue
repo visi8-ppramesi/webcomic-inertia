@@ -15,28 +15,32 @@
                         <div class="text-white float-right">More</div>
                         <div>New Releases</div>
                     </div>
-                    <div>
-                        <horizontal-slider
-                            :items="processToHorizontalSlider(comics.all)"
-                            :config="config"
-                            objectCategory="all"
-                            @nextPage="nextPage"
-                        ></horizontal-slider>
-                    </div>
+                    <mq-responsive target="sm-" tag="span">
+                        <div>
+                            <horizontal-slider
+                                :items="processToHorizontalSlider(comics.all)"
+                                :config="config"
+                                objectCategory="all"
+                                @nextPage="nextPage"
+                            ></horizontal-slider>
+                        </div>
+                    </mq-responsive>
                 </div>
                 <div class="mb-3 text-white" v-for="(tag, idx) in shownTags" :key="'tag-' + idx">
                     <div>
                         <div class="text-white float-right">More</div>
                         <div>{{tag}}</div>
                     </div>
-                    <div>
-                        <horizontal-slider
-                            :items="processToHorizontalSlider(comics[tag])"
-                            :config="config"
-                            :objectCategory="tag"
-                            @nextPage="nextPage"
-                        ></horizontal-slider>
-                    </div>
+                    <mq-responsive target="sm-" tag="span">
+                        <div>
+                            <horizontal-slider
+                                :items="processToHorizontalSlider(comics[tag])"
+                                :config="config"
+                                :objectCategory="tag"
+                                @nextPage="nextPage"
+                            ></horizontal-slider>
+                        </div>
+                    </mq-responsive>
                 </div>
             </div>
             <div class="px-5 py-5 bg-gray-100">
@@ -45,14 +49,16 @@
                         <div class="float-right">More</div>
                         <div>Authors</div>
                     </div>
-                    <div>
-                        <horizontal-slider
-                            :items="processToAuthorHorizontalSlider(authors.all)"
-                            :config="configAuthor"
-                            objectCategory="all"
-                            @nextPage="nextAuthorPage"
-                        ></horizontal-slider>
-                    </div>
+                    <mq-responsive target="sm-" tag="span">
+                        <div>
+                            <horizontal-slider
+                                :items="processToAuthorHorizontalSlider(authors.all)"
+                                :config="configAuthor"
+                                objectCategory="all"
+                                @nextPage="nextAuthorPage"
+                            ></horizontal-slider>
+                        </div>
+                    </mq-responsive>
                 </div>
             </div>
         </div>
@@ -97,7 +103,7 @@ export default {
                 }
             },
             query: {
-                paginate: 5,
+                paginate: 8,
                 page: 1
             },
             config: {

@@ -61,9 +61,9 @@ export default {
     display: none;
 }
 .scroller-container{
-    max-height: 155px;
-    min-width: 100px;
-    height: 155px;
+    max-height: 205px;
+    min-width: 150px;
+    height: 205px;
     border-radius: 10px;
 }
 

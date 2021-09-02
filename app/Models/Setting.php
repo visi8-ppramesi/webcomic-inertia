@@ -10,6 +10,13 @@ class Setting extends Model
     use HasFactory;
     protected $guarded = [];
 
+    public static function setValue($name, $value){
+        return self::updateOrCreate(
+            ['name' => $name],
+            ['values' => json_encode($value)]
+        );
+    }
+
     public static function getValue($name){
         return json_decode(self::where('name', $name)->first()->values, true);
     }

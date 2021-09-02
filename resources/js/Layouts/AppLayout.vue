@@ -100,9 +100,9 @@
             </div> -->
             <div class="min-h-screen main-content flex-1 bg-gradient-to-t from-purple-800 to-indigo-900 md:pb-5 h-auto text-black">
                 <!-- <router-view :key="$route.fullPath"></router-view> -->
-                <div class="max-w-7xl mx-auto">
+                <!-- <div class="max-w-7xl mx-auto"> -->
                     <slot :key="route().current()"></slot>
-                </div>
+                <!-- </div> -->
             </div>
         </div>
         <div class="w-100 bg-gray-800 divide-y text-center h-full">
