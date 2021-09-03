@@ -7,11 +7,18 @@ use App\Models\Chapter;
 use App\Models\Comic;
 use App\Models\Page;
 use App\Models\Setting;
+use App\Models\Comment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use tizis\laraComments\UseCases\CommentService;
 
 class ViewController extends Controller
 {
+    public function viewMyTokensShow(){
+        return Inertia::render('MyTokensShow');
+    }
+
     public function viewDashboard(){
         $settings = Setting::getValues([
             'dashboard.tags',
@@ -27,10 +34,12 @@ class ViewController extends Controller
 
     public function viewComicShow(Comic $comic){
         $u = auth()->user();
-        $comic->load('chapters');
+        $comic->load(['chapters', 'authors']);
         return Inertia::render('ComicShow', [
             'user' => $u,
-            'comic' => $comic
+            'comic' => $comic,
+            'comment_key' => $comic->getEncryptedKey(),
+            'comments' => $comic->commentsWithChildrenAndCommenter()->parentless()->get()
         ]);
     }
 
@@ -41,13 +50,16 @@ class ViewController extends Controller
     }
 
     public function viewChapterShow(Comic $comic, Chapter $chapter){
-        $pages = Page::where('chapter_id', $chapter->id);
+        // $pages = Page::where('chapter_id', $chapter->id);
         $u = auth()->user();
+        $comic->load('chapters');
         if($u->checkChapterPurchased($chapter->id)){
             $param = [
                 'comic' => $comic,
                 'chapter' => $chapter,
-                'pages' => $pages
+                'pages' => $chapter->pages,
+                'comment_key' => $chapter->getEncryptedKey(),
+                'comments' => $chapter->commentsWithChildrenAndCommenter()->parentless()->get()
             ];
             if(request()->has('ar')){
                 $param['ar'] = request('ar');
@@ -105,5 +117,9 @@ class ViewController extends Controller
         return Inertia::render('PrivacyShow', [
 
         ]);
+    }
+
+    public function viewPurchaseTokens(){
+
     }
 }

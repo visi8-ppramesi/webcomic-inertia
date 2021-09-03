@@ -175,7 +175,7 @@ class User extends Authenticatable //implements MustVerifyEmail
         return self::where('id', $uid)->update(['subscriptions' => $currentFave]);
     }
 
-    public function bookmarkPage($chapterId){
+    public function bookmarkChapter($chapterId){
         $comicId = Chapter::findOrFail($chapterId)->comic_id;
         $currentBookmark = json_decode($this->bookmark, true);
         $currentBookmark[$comicId] = $chapterId;

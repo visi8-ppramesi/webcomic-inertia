@@ -22,6 +22,7 @@ module.exports = {
               "screen/3": "calc(100vh / 3)",
               "screen/4": "calc(100vh / 4)",
               "screen/5": "calc(100vh / 5)",
+              "fit-content": "fit-content"
             }),
             width: theme => ({
               "screen/2": "50vw",
@@ -31,6 +32,7 @@ module.exports = {
               "screen/6": "calc(100vw / 6)",
               "screen/8": "calc(100vw / 8)",
               "screen/10": "calc(100vw / 10)",
+              "fit-content": "fit-content"
             }),
             maxHeight: theme => ({
               '0': '0',

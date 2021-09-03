@@ -27,5 +27,10 @@ class DatabaseSeeder extends Seeder
         Comic::factory(10)->create();
         Chapter::factory(200)->create();
         Page::factory(400)->create();
+
+        foreach(Comic::get() as $idx => $comic){
+            $authors = Author::inRandomOrder()->limit(2)->get()->pluck('id')->toArray();
+            $comic->authors()->sync($authors);
+        }
     }
 }

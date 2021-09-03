@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 class ComicController extends Controller
 {
+    public function fetchComments(Comic $comic){
+        return response()->json($comic->commentsWithChildrenAndCommenter()->parentless()->get(), 200);
+    }
+
     public function getComicChapters($comicId){
         $chapters = Page::where('comic_id', $comicId)->get()->pluck('chapter')->toArray();
         return response()->json(array_values(array_unique($chapters)), 200);

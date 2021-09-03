@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class ChapterController extends Controller
 {
+    public function fetchComments(Chapter $chapter){
+        return response()->json($chapter->commentsWithChildrenAndCommenter()->parentless()->get(), 200);
+    }
+
+    public function bookmarkChapter(Chapter $chapter){
+        $u = auth()->user();
+        return response()->json($u->bookmarkChapter($chapter->id));
+    }
+
     public function purchaseChapter(Request $request){
         $validated = $request->validate([
             'ar' => ['boolean', 'required'],

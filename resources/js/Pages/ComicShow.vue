@@ -4,26 +4,32 @@
             <div class="description-block text-white flex flex-col justify-end p-5" :style="'background-image:linear-gradient(to bottom, rgba(245, 246, 252, 0), rgb(0 0 0 / 73%)), url(' + comic.cover_url + ');'"><!-- top block -->
                 <div>
                     <template v-for="(genre, idx) in genres" :key="'genre-' + idx">
-                        <Link :href="{name: 'search', query: {search: genre}}">{{genre}}<span v-if="idx < genres.length - 1" :key="'comma-' + idx">, </span></Link>
+                        <Link :href="route('web.search', {search: genre})">{{genre}}<span v-if="idx < genres.length - 1" :key="'comma-' + idx">, </span></Link>
                     </template>
                 </div><!-- make it linkable later -->
-                <div class="text-2xl font-bold">{{comic.title}}</div>
+                <div class="flex flex-row justify-between">
+                    <div class="text-2xl font-bold w-2/3">{{comic.title}}</div>
+                    <button class="w-fit-content h-fit-content mt-3 inline-flex items-center justify-center px-2 py-1 rounded-full text-gray-50 bg-green-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="favoriteComic">
+                        Subscribe
+                    </button>
+                </div>
                 <div>
                     <template v-for="(author, idx) in authors" :key="'author-' + idx">
-                        <Link :href="{name: 'authorShow', params: {authorId: author.id}}">{{author.name}}<span v-if="idx < authors.length - 1" :key="'comma-' + idx">, </span></Link>
+                        <Link :href="route('web.author', {author: author.id})">{{author.name}}<span v-if="idx < authors.length - 1" :key="'comma-' + idx">, </span></Link>
                     </template>
                 </div>
                 <div class="text-sm">{{comic.description}}</div>
                 <div class="flex flex-row content-center justify-between">
+                    <!-- <button class="text-sm mt-3 inline-flex items-center justify-center px-2 py-1 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="continueReading(true)">Subscribe</button> -->
                     <template v-if="purchased">
-                        <button class="text-sm mt-3 mt-3 inline-flex items-center justify-center p-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="continueReading(true)">View with AR</button>
-                        <button class="text-sm mt-3 inline-flex items-center justify-center p-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" v-if="isEmpty(bookmark)" @click="startReading">Start Reading</button>
-                        <button class="text-sm mt-3 inline-flex items-center justify-center p-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" v-else @click="continueReading(false)">Continue Reading</button>
+                        <button class="text-sm mt-3 inline-flex items-center justify-center px-2 py-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="continueReading(true)">View with AR</button>
+                        <button class="text-sm mt-3 inline-flex items-center justify-center px-2 py-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" v-if="isEmpty(bookmark)" @click="startReading">Start Reading</button>
+                        <button class="text-sm mt-3 inline-flex items-center justify-center px-2 py-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" v-else @click="continueReading(false)">Continue Reading</button>
                     </template>
                     <!-- <template v-else>
-                        <button class="mt-3 inline-flex items-center justify-center p-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="openModal">Buy Comic</button>
+                        <button class="mt-3 inline-flex items-center justify-center px-2 py-1 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="openModal">Buy Comic</button>
                     </template> -->
-                    <button class="mt-3 inline-flex items-center justify-center p-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="favoriteComic">
+                    <button class="mt-3 inline-flex items-center justify-center px-2 py-2 rounded-full text-gray-50 bg-green-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="favoriteComic">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path class="animated" :class="favorited ? 'fill-white' : 'fill-none'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
@@ -56,10 +62,11 @@
                 </div>
             </div>
             <div class="p-5 text-white">
-                <div class="mb-5">
-                    Comments:
-                </div>
-                <div class="flex flex-row mb-4 comment-container" v-for="(comment, idx) in comments" :key="'comm' + idx">
+                <add-new-comment
+                    :commentKey="$page.props.comment_key"
+                />
+                <comments class="mt-5" :comments="comments"/>
+                <!-- <div class="flex flex-row mb-4 comment-container" v-for="(comment, idx) in comments" :key="'comm' + idx">
                     <div class="comment-profile rounded-xl border border-gray-100">
                         <img :src="userIcon.default" alt="">
                     </div>
@@ -71,7 +78,7 @@
                             {{comment.comment}}
                         </div>
                     </div>
-                </div>
+                </div> -->
             </div>
             <modal v-model="modal">
                 <template v-slot:body>
@@ -94,12 +101,17 @@
                     </div>
                 </template>
             </modal>
+            <div v-show="false">
+                <Link class="purchase-token-link" :href="route('web.mytokens')">Purchase more tokens!</Link>
+            </div>
         </div>
     </app-layout>
 </template>
 
 <script>
 import Modal from '../Components/Modal.vue'
+import AddNewComment from '../Components/AddNewComment.vue'
+import Comments from '../Components/Comments.vue'
 import AppLayout from '@/Layouts/AppLayout.vue'
 import { usePage } from '@inertiajs/inertia-vue3'
 
@@ -107,7 +119,9 @@ export default {
     name: 'comic-show',
     components: {
         Modal,
-        AppLayout
+        AppLayout,
+        AddNewComment,
+        Comments
     },
     props: ['comic'],
     inject: ['swal'],
@@ -129,28 +143,14 @@ export default {
             episodeModal: null,
             userIcon: require('../../icons/user-icon.png'),
             tokenPrice: 0,
-            comments: [
-                {
-                    username: 'wahyu1989',
-                    comment: 'wow this is really good!'
-                },
-                {
-                    username: 'santo0813',
-                    comment: 'yes this is good'
-                },
-                {
-                    username: 'santo0813',
-                    comment: 'actually this is really good'
-                },
-                {
-                    username: 'santi',
-                    comment: 'i agree'
-                }
-            ]
+            comments: []
         }
     },
     created(){
+        this.comments = this.$page.props.comments
         this.comic = usePage().props.value.comic
+        this.tags = JSON.parse(this.comic.tags)
+        this.genres = JSON.parse(this.comic.genres)
         this.chapters = this.comic.chapters
         let self = this
         this.emitter.on('closeModal', function(){
@@ -168,6 +168,8 @@ export default {
             this.bookmark = response.data
         })
         this.favorited = _.includes(JSON.parse(this.user.favorites).map(x => +x), this.comic.id)
+        this.authors = this.comic.authors
+        this.emitter.on('reloadComments', this.reloadComments)
 
         // axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
         // .then((response) => {
@@ -203,6 +205,12 @@ export default {
         // })
     },
     methods: {
+        reloadComments(){
+            return axios.get(route('api.comic.fetch.comments', {comic: this.comic.id}))
+            .then((response) => {
+                this.comments = response.data
+            })
+        },
         favoriteComic(){
             return axios.get(route('api.comic.favorite', {comicId: this.comic.id}))
             .then((response) => {
@@ -268,7 +276,7 @@ export default {
         },
         startReading(){
             console.log(this.comic.chapters[0].id)
-            this.$inertia.visit(route('web.chapter', {comic: usePage().props.value.comic.id, chapter: this.comic.chapters[0].id, ar: true}))
+            this.$inertia.visit(route('web.chapter', {comic: usePage().props.value.comic.id, chapter: this.comic.chapters[0].id, ar: false}))
             // this.$router.push({name: 'pageShow', params: {
             //     comicId: this.$route.params.comicId,
             //     chapter: this.previews[0].chapter,
@@ -317,7 +325,11 @@ export default {
                         icon: "error",
                         title: "Not Enough Token",
                         text: "You don't have enough token! Please purchase more tokens!",
-                    });
+                        footer: document.getElementsByClassName('purchase-token-link')[0].parentElement.innerHTML
+                    })
+                    .then((e) => {
+                        console.log(e)
+                    })
                 }else if(status === -1){
                     this.modal = false
                     this.episodeModal = null

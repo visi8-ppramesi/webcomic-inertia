@@ -14,10 +14,10 @@ class PageController extends Controller
         return response()->json($u->getComicBookmarkedPage($comicId));
     }
 
-    public function bookmarkPage($pageId){
-        $u = auth()->user();
-        return response()->json($u->bookmarkPage($pageId));
-    }
+    // public function bookmarkPage($pageId){
+    //     $u = auth()->user();
+    //     return response()->json($u->bookmarkPage($pageId));
+    // }
 
     public function getPageScene(Page $page){
         return response()->json(['config' => $page->config, 'scene' => $page->scene], 200);

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <app-layout>
         <div>
             <div class="">
                 <div class="bg-gray-300 w-full h-10 border-t-2 border-b-2 border-black">
@@ -39,7 +39,7 @@
                                    @nextPage="nextPage"></horizontal-slider>
             </div>
         </div>
-    </div>
+    </app-layout>
 </template>
 
 <script>
@@ -49,7 +49,7 @@
         name: 'mycomic',
         components: {
             HorizontalSlider,
-            AppLayout
+            AppLayout,
         },
         created() {
             this.shownTags.forEach((elem) => {

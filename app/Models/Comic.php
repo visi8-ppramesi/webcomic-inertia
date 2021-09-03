@@ -6,10 +6,13 @@ use App\Filters\Get;
 use App\Traits\Pipeable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use tizis\laraComments\Contracts\ICommentable;
+use tizis\laraComments\Traits\Commentable;
 
-class Comic extends Model
+class Comic extends Model implements ICommentable
 {
     use HasFactory;
+    use Commentable;
     use Pipeable;
     protected $guarded = [];
 

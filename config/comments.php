@@ -6,11 +6,11 @@ return [
         /**
          * Commenter model
          */
-        'commenter' => \App\User::class,
+        'commenter' => \App\Models\User::class,
         /**
          * Comment model
          */
-        'comment' => \App\Comment::class
+        'comment' => \App\Models\Comment::class
     ],
     'ui' => 'bootstrap4',
     'purifier' => [

@@ -15,7 +15,7 @@
                     </div>
                 </div>
             </div>
-            <div class="px-5 pb-5 bg-gradient-to-t  to-indigo-900 from-purple-900 pt-2">
+            <div class="px-5 py-5 bg-gradient-to-t  to-indigo-900 from-purple-900">
                 <div class="mb-3 text-white">
                     <div>
                         <div class="text-white float-right">More</div>

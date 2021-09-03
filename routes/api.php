@@ -4,6 +4,7 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\ComicController;
 use App\Http\Controllers\PageController;
+use App\Models\Chapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -34,7 +35,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::get('/comic/favorite/{comicId}', [ComicController::class, 'toggleFavoriteComic'])->name('api.comic.favorite');
     Route::get('/comic/chapters/{comicId}', [ComicController::class, 'getComicChapters'])->name('api.comic.get.chapters');
-    Route::get('/page/bookmark/{pageId}', [PageController::class, 'bookmarkPage'])->name('api.page.bookmark');
+    Route::get('/chapter/bookmark/{chapter}', [ChapterController::class, 'bookmarkChapter'])->name('api.chapter.bookmark');
 
     Route::get('/pages/{comicId}/{chapter}/', [PageController::class, 'getComicPages'])->name('api.pages.show');
     Route::get('/scene/{page}', [PageController::class, 'getPageScene'])->name('api.page.show.scene');
@@ -78,3 +79,5 @@ Route::get('/comics', [ComicController::class, 'index'])->name('api.comics.list'
 Route::get('/author/{author}', [AuthorController::class, 'show'])->name('api.author.show');
 Route::get('/authors', [AuthorController::class, 'index'])->name('api.authors.list');
 Route::get('/chapter/checkar/{chapter}', [ChapterController::class, 'checkAr'])->name('api.chapter.check.ar');
+Route::get('/comic/comments/{comic}', [ComicController::class, 'fetchComments'])->name('api.comic.fetch.comments');
+Route::get('/chapter/comments/{chapter}', [ChapterController::class, 'fetchComments'])->name('api.chapter.fetch.comments');

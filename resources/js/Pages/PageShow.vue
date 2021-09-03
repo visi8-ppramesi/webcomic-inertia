@@ -1,60 +1,76 @@
 <template>
-    <div class="w-full">
-        <div class="w-full mt-1 mb-2 px-5 py-2 text-center">
-            <label for="chapter" class="text-white">Select chapter</label>
-            <div class="flex">
-                <select class="rounded-lg form-select block w-full mt-1" @change="changeChapter(selectedChapter)" v-model="selectedChapter">
-                    <option v-for="(chapter, idx) in chapters" :value="chapter" :key="'cpt-' + idx">Episode {{chapter}}</option>
-                </select>
-                <!-- <svg @click="prevChapter" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1 mr-1" fill="none" viewBox="0 0 24 24" :stroke="prevEnabled ? '#2f2f2f' : '#919191'">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <select class="form-select block w-full mt-1" @change="changeChapter(selectedChapter)" v-model="selectedChapter">
-                    <option v-for="(chapter, idx) in chapters" :value="chapter" :key="'cpt-' + idx">{{chapter}}</option>
-                </select>
-                <svg @click="nextChapter" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1 ml-1" fill="none" viewBox="0 0 24 24" :stroke="nextEnabled ? '#2f2f2f' : '#919191'">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg> -->
+    <app-layout>
+        <div class="w-full">
+            <div class="w-full mt-1 mb-2 px-5 py-2 text-center">
+                <label for="chapter" class="text-white">Select chapter</label>
+                <div class="flex">
+                    <select class="rounded-lg form-select block w-full mt-1" @change="changeChapter(selectedChapter)" v-model="selectedChapter">
+                        <option v-for="(chapter, idx) in chapters" :value="chapter.id" :key="'cpt-' + idx">Episode {{chapter.chapter}}</option>
+                    </select>
+                    <!-- <svg @click="prevChapter" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1 mr-1" fill="none" viewBox="0 0 24 24" :stroke="prevEnabled ? '#2f2f2f' : '#919191'">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <select class="form-select block w-full mt-1" @change="changeChapter(selectedChapter)" v-model="selectedChapter">
+                        <option v-for="(chapter, idx) in chapters" :value="chapter" :key="'cpt-' + idx">{{chapter}}</option>
+                    </select>
+                    <svg @click="nextChapter" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1 ml-1" fill="none" viewBox="0 0 24 24" :stroke="nextEnabled ? '#2f2f2f' : '#919191'">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg> -->
+                </div>
             </div>
-        </div>
-        <template v-for="(page, idx) in pages">
-            <div v-if="page.id in scenePages && isAr" :class="{glow: shownClass['ar-' + page.id], 'fill-width': !shownClass['ar-' + page.id]}" class="w-100 glow-animation" :key="'img-' + idx" :id="'ar-' + page.id">
-                <Link :href="{name: 'sceneShow', params: {pageId: page.id}}">
+            <template v-for="(page, idx) in pages">
+                <div v-if="page.id in scenePages && isAr" :class="{glow: shownClass['ar-' + page.id], 'fill-width': !shownClass['ar-' + page.id]}" class="w-100 glow-animation" :key="'img-' + idx" :id="'ar-' + page.id">
+                    <Link :href="{name: 'sceneShow', params: {pageId: page.id}}">
+                        <img class="lg:object-fill lg:w-full" :src="page.image_url">
+                    </Link>
+                </div>
+                <div v-else :key="'img-' + idx">
                     <img class="lg:object-fill lg:w-full" :src="page.image_url">
-                </Link>
+                </div>
+            </template>
+            <!-- <div :class="{glow: shownClass['ar-' + page.id], 'fill-width': !shownClass['ar-' + page.id]}" class="w-100 glow-animation" v-for="(page, idx) in pages" :key="'img-' + idx" :id="page.id in scenePages ? 'ar-' + page.id : null">
+                <img :src="page.image_url">
+            </div> -->
+            <div class="flex justify-center mt-8 pb-5">
+                <button @click="prevChapter" class="flex bg-indigo-900 h-8 w-20 text-white rounded-lg justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1 mr-1" fill="none" viewBox="0 0 24 24" :stroke="prevEnabled ? '#919191' : '#2f2f2f'">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <div class="mt-1" :class="!prevEnabled ? 'text-gray-500' : ''">Prev</div>
+                </button>
+                <button @click="nextChapter" class="ml-5 flex bg-indigo-900 h-8 w-20 text-white rounded-lg justify-center">
+                    <div class="mt-1" :class="!nextEnabled ? 'text-gray-500' : ''">Next</div>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1 ml-1" fill="none" viewBox="0 0 24 24" :stroke="nextEnabled ? '#919191' : '#2f2f2f'">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                </button>
             </div>
-            <div v-else :key="'img-' + idx">
-                <img class="lg:object-fill lg:w-full" :src="page.image_url">
+
+            <div class="p-5 text-white">
+                <add-new-comment
+                    :commentKey="$page.props.comment_key"
+                />
+                <comments class="mt-5" :comments="comments"/>
             </div>
-        </template>
-        <!-- <div :class="{glow: shownClass['ar-' + page.id], 'fill-width': !shownClass['ar-' + page.id]}" class="w-100 glow-animation" v-for="(page, idx) in pages" :key="'img-' + idx" :id="page.id in scenePages ? 'ar-' + page.id : null">
-            <img :src="page.image_url">
-        </div> -->
-        <div class="flex justify-center mt-8 pb-5">
-            <button @click="prevChapter" class="flex bg-indigo-900 h-8 w-20 text-white rounded-lg justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1 mr-1" fill="none" viewBox="0 0 24 24" :stroke="prevEnabled ? '#919191' : '#2f2f2f'">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                <div class="mt-1">Prev</div>
-            </button>
-            <button @click="nextChapter" class="ml-5 flex bg-indigo-900 h-8 w-20 text-white rounded-lg justify-center">
-                <div class="mt-1">Next</div>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mt-1 ml-1" fill="none" viewBox="0 0 24 24" :stroke="nextEnabled ? '#919191' : '#2f2f2f'">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-            </button>
         </div>
-    </div>
+    </app-layout>
 </template>
 
 <script>
 import AppLayout from '@/Layouts/AppLayout.vue'
+import AddNewComment from '../Components/AddNewComment.vue'
+import Comments from '../Components/Comments.vue'
 export default {
     name:'page',
     props: ['comic', 'chapter', 'pages', 'ar'],
+    components:{
+        AppLayout,
+        AddNewComment,
+        Comments
+    },
     data(){
         return {
-            // pages: [],
+            pages: [],
             chapters: [],
             selectedChapter: 1,
             prevEnabled: false,
@@ -62,31 +78,33 @@ export default {
             scenePages: {},
             shownClass: {},
             arElems: {},
-            isAr: false
+            isAr: false,
+            comments: []
         }
     },
     methods:{
         changeChapter(newchapter){
+            this.$inertia.visit(route('web.chapter', {comic: this.comic.id, chapter: newchapter}))
             // this.fetchPages(this.$route.params.comicId, this.selectedChapter)
-            this.$router.push({name: 'pageShow',
-                params: {
-                    comicId: this.$route.params.comicId,
-                    chapter: newchapter
-                },
-                query: {
-                    ar: this.isAr
-                }
-            })
+            // this.$router.push({name: 'pageShow',
+            //     params: {
+            //         comicId: this.$route.params.comicId,
+            //         chapter: newchapter
+            //     },
+            //     query: {
+            //         ar: this.isAr
+            //     }
+            // })
         },
         nextChapter(){
             if(this.nextEnabled){
-                let currentChapter = this.chapters.length - (this.chapters.slice().reverse().findIndex((el) => el == this.$route.params.chapter)) - 1
+                let currentChapter = this.chapters.length - (this.chapters.slice().reverse().findIndex((el) => el.id == this.chapter.id)) - 1
                 this.changeChapter(this.chapters[currentChapter + 1])
             }
         },
         prevChapter(){
             if(this.prevEnabled){
-                let currentChapter = this.chapters.length - (this.chapters.slice().reverse().findIndex((el) => el == this.$route.params.chapter)) - 1
+                let currentChapter = this.chapters.length - (this.chapters.slice().reverse().findIndex((el) => el.id == this.chapter.id)) - 1
                 this.changeChapter(this.chapters[currentChapter - 1])
             }
         },
@@ -137,7 +155,13 @@ export default {
                 right <= (window.innerWidth || document.documentElement.clientWidth)
             )
             return visible;
-        }
+        },
+        reloadComments(){
+            return axios.get(route('api.chapter.fetch.comments', {chapter: this.chapter.id}))
+            .then((response) => {
+                this.comments = response.data
+            })
+        },
     },
     destroyed(){
         window.removeEventListener('scroll', this.handleScroll)
@@ -146,7 +170,12 @@ export default {
         // window.addEventListener('scroll', this.handleScroll)
     },
     created(){
+        this.comments = this.$page.props.comments
         this.isAr = this.ar === 'true'
+        this.chapters = this.comic.chapters
+        this.prevEnabled = this.chapter.id != this.chapters[0].id
+        this.nextEnabled = this.chapter.id != this.chapters[this.chapters.length - 1].id
+        this.selectedChapter = this.chapter.id
         // this.isAr = this.$route.query.ar
         // axios.get(route('api.author.show', {author:1}))
         // this.fetchChapters(this.$route.params.comicId)
@@ -154,29 +183,31 @@ export default {
         //     this.prevEnabled = this.$route.params.chapter != this.chapters[0]
         //     this.nextEnabled = this.$route.params.chapter != this.chapters[this.chapters.length - 1]
         // })
-        this.fetchPages(this.comic.id, this.chapter.id)
-        .then((resp) => {
-            let k = {}
-            this.pages.filter((el) => {
-                return !!el.scene
-            }).forEach((el) => {
-                k[el.id] = el.scene
-            })
-            this.scenePages = k
+        this.pages = this.$page.props.pages
+        // this.fetchPages(this.comic.id, this.chapter.id)
+        // .then((resp) => {
+        let k = {}
+        this.pages.filter((el) => {
+            return !!el.scene
+        }).forEach((el) => {
+            k[el.id] = el.scene
+        })
+        this.scenePages = k
 
-            this.$nextTick(() => {
-                let elems = {}
-                Object.keys(this.scenePages).forEach((el) => {
-                    elems[el] = document.getElementById('ar-' + el)
-                })
-                this.arElems = elems
-                this.handleScroll()
-                window.addEventListener('scroll', this.handleScroll)
+        this.$nextTick(() => {
+            let elems = {}
+            Object.keys(this.scenePages).forEach((el) => {
+                elems[el] = document.getElementById('ar-' + el)
             })
+            this.arElems = elems
+            this.handleScroll()
+            window.addEventListener('scroll', this.handleScroll)
         })
-        .then((resp) => {
-            axios.get(route('api.page.bookmark', {pageId: this.pages[0].id}))
-        })
+        // })
+        // .then((resp) => {
+        axios.get(route('api.chapter.bookmark', {chapter: this.chapter.id}))
+        this.emitter.on('reloadComments', this.reloadComments)
+        // })
     },
 }
 </script>
