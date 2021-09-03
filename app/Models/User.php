@@ -12,7 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 use tizis\laraComments\Traits\Commenter;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable //implements MustVerifyEmail
 {
     use HasRoles;
     use HasApiTokens;
@@ -192,14 +192,15 @@ class User extends Authenticatable implements MustVerifyEmail
             }
             so initialized to {comic:[], chapter: []}
         */
-        $currentFave = json_decode($this->favorites, true);
-        if(in_array($objectId, $currentFave[$type])){
-            $currentFave[$type][] = $objectId;
+        $currentFave = array_values(json_decode($this->favorites));
+        if(!in_array($objectId, $currentFave)){
+            $currentFave[] = $objectId;
         }else{
-            $currentFave[$type] = array_values(array_diff($currentFave[$type], [$objectId]));
+            $currentFave = array_diff($currentFave, [$objectId]);
         }
         $uid = $this->id;
-        return self::where('id', $uid)->update(['favorites' => $currentFave]);
+        self::where('id', $uid)->update(['favorites' => $currentFave]);
+        return $currentFave;
     }
 
     public function getComicBookmarkedPage($comicId){

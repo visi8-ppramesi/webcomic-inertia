@@ -1,5 +1,5 @@
 <template>
-    <div class="grid grid-cols-12 gap-2 flex-wrap overflow-x-auto overflow-x-hidden h-40">
+    <div class="grid sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 flex-wrap overflow-x-auto overflow-x-hidden h-40">
         <div v-for="(item, idx) in items.items" class="w-12 card mr-1 bg-gradient-to-t from-indigo-900 to-indigo-400 min-h-full min-w-full" :key="'item-' + idx">
             <!-- <div>
                 <router-link :to="item.url">

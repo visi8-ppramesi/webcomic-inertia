@@ -23,7 +23,11 @@
                     <!-- <template v-else>
                         <button class="mt-3 inline-flex items-center justify-center p-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="openModal">Buy Comic</button>
                     </template> -->
-                    <button class="mt-3 inline-flex items-center justify-center p-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="favorite">Favorite</button>
+                    <button class="mt-3 inline-flex items-center justify-center p-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="favoriteComic">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path class="animated" :class="favorited ? 'fill-white' : 'fill-none'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </button>
                 </div>
             </div>
             <div class="divide-y divide-black">
@@ -110,6 +114,7 @@ export default {
     data(){
         return {
             showArOption: false,
+            favorited: false,
             arSelected: false,
             user: null,
             modal: false,
@@ -162,6 +167,7 @@ export default {
         .then((response) => {
             this.bookmark = response.data
         })
+        this.favorited = _.includes(JSON.parse(this.user.favorites).map(x => +x), this.comic.id)
 
         // axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
         // .then((response) => {
@@ -197,6 +203,12 @@ export default {
         // })
     },
     methods: {
+        favoriteComic(){
+            return axios.get(route('api.comic.favorite', {comicId: this.comic.id}))
+            .then((response) => {
+                this.favorited = _.includes(response.data.map(x => +x), this.comic.id)
+            })
+        },
         checkPurchased(){
             return axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
         },
@@ -277,9 +289,6 @@ export default {
             return _.isEmpty(item)
         },
         gotToTag(){
-
-        },
-        favorite(){
 
         },
         goToChapter(chapter, ar = false){
@@ -365,5 +374,14 @@ export default {
 }
 .comment-container{
     margin-left:-17px;
+}
+.animated{
+    transition: fill 0.1s;
+}
+.fill-white{
+    fill:white;
+}
+.fill-none{
+    fill:transparent;
 }
 </style>
