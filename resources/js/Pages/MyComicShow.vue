@@ -7,23 +7,31 @@
                 </div>
             </div>
             <div class="px-5 pt-5">
-                <horizontal-slider :items="processToHorizontalSlider(comics.all)"
-                                   :config="config"
-                                   objectCategory="all"
-                                   @nextPage="nextPage"></horizontal-slider>
+                <grid
+                    :items="processToHorizontalSlider(comics.all)"
+                    :config="config"
+                    objectCategory="all"
+                    @nextPage="nextPage"
+                ></grid>
+                <!-- <horizontal-slider :items="processToHorizontalSlider(comics.all)"
+                    :config="config"
+                    objectCategory="all"
+                    @nextPage="nextPage"
+                ></horizontal-slider> -->
             </div>
         </div>
         <div>
             <div class="pt-5">
                 <div class="bg-gray-300 w-full h-10 border-t-2 border-b-2 border-black">
-                    <div class="text-center text-lg pt-1">My Comic</div>
+                    <div class="text-center text-lg pt-1">Purchased Comics</div>
                 </div>
             </div>
             <div class="px-5 pt-5">
                 <horizontal-slider :items="processToHorizontalSlider(comics.all)"
-                                   :config="config"
-                                   objectCategory="all"
-                                   @nextPage="nextPage"></horizontal-slider>
+                    :config="config"
+                    objectCategory="all"
+                    @nextPage="nextPage"
+                ></horizontal-slider>
             </div>
         </div>
         <div>
@@ -34,9 +42,10 @@
             </div>
             <div class="px-5 py-5">
                 <horizontal-slider :items="processToHorizontalSlider(comics.all)"
-                                   :config="config"
-                                   objectCategory="all"
-                                   @nextPage="nextPage"></horizontal-slider>
+                    :config="config"
+                    objectCategory="all"
+                    @nextPage="nextPage"
+                ></horizontal-slider>
             </div>
         </div>
     </app-layout>
@@ -44,14 +53,18 @@
 
 <script>
     import HorizontalSlider from '../Components/HorizontalSlider.vue'
+    import Grid from '../Components/Grid.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
     export default {
         name: 'mycomic',
+        props: ['subscriptions', 'favorites', 'purchased'],
         components: {
             HorizontalSlider,
+            Grid,
             AppLayout,
         },
         created() {
+            console.log(this.subscriptions)
             this.shownTags.forEach((elem) => {
                 this.comics[elem] = {}
                 this.comics[elem].comics = []

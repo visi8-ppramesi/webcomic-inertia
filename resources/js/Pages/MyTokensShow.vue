@@ -70,6 +70,11 @@
                         text: "Comment purchase succesful!",
                     })
                 })
+                .then((response) => {
+                    let lastPage = JSON.parse(localStorage.getItem('lastPage')) || {routeName: 'web.dashboard', params: {}}
+                    localStorage.removeItem('lastPage')
+                    this.$inertia.visit(route(lastPage.routeName, lastPage.params))
+                })
             }
         }
     }

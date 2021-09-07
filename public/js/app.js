@@ -20880,7 +20880,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       return +x;
     }), this.comic.id);
     this.authors = this.comic.authors;
-    this.emitter.on('reloadComments', this.reloadComments); // axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
+    this.emitter.on('reloadComments', this.reloadComments);
+    localStorage.setItem('lastPage', JSON.stringify({
+      routeName: 'web.comic',
+      params: {
+        comic: this.comic.id
+      }
+    })); // axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
     // .then((response) => {
     //     this.purchaseObj = response.data
     //     this.purchased = Object.keys({...response.data}).length > 0
@@ -21364,7 +21370,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _Components_HorizontalSlider_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Components/HorizontalSlider.vue */ "./resources/js/Components/HorizontalSlider.vue");
-/* harmony import */ var _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/Layouts/AppLayout.vue */ "./resources/js/Layouts/AppLayout.vue");
+/* harmony import */ var _Components_Grid_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Components/Grid.vue */ "./resources/js/Components/Grid.vue");
+/* harmony import */ var _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @/Layouts/AppLayout.vue */ "./resources/js/Layouts/AppLayout.vue");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) { symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); } keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -21373,15 +21380,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'mycomic',
+  props: ['subscriptions', 'favorites', 'purchased'],
   components: {
     HorizontalSlider: _Components_HorizontalSlider_vue__WEBPACK_IMPORTED_MODULE_0__.default,
-    AppLayout: _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_1__.default
+    Grid: _Components_Grid_vue__WEBPACK_IMPORTED_MODULE_1__.default,
+    AppLayout: _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_2__.default
   },
   created: function created() {
     var _this = this;
 
+    console.log(this.subscriptions);
     this.shownTags.forEach(function (elem) {
       _this.comics[elem] = {};
       _this.comics[elem].comics = [];
@@ -21490,6 +21501,14 @@ __webpack_require__.r(__webpack_exports__);
           title: "Token purchased!",
           text: "Comment purchase succesful!"
         });
+      }).then(function (response) {
+        var lastPage = JSON.parse(localStorage.getItem('lastPage')) || {
+          routeName: 'web.dashboard',
+          params: {}
+        };
+        localStorage.removeItem('lastPage');
+
+        _this.$inertia.visit(route(lastPage.routeName, lastPage.params));
       });
     }
   }
@@ -22867,7 +22886,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "grid sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 flex-wrap overflow-x-auto overflow-x-hidden h-40"
+  "class": "grid grid-cols-1 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 flex-wrap overflow-x-auto overflow-x-hidden min-h-40"
 };
 var _hoisted_2 = {
   "class": "flex items-center justify-center"
@@ -22877,14 +22896,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($props.items.items, function (item, idx) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
-      "class": "w-12 card mr-1 bg-gradient-to-t from-indigo-900 to-indigo-400 min-h-full min-w-full",
+      "class": "w-12 card mr-1 bg-gradient-to-t from-indigo-900 to-indigo-400 min-h-full min-w-full rounded-lg",
       key: 'item-' + idx
     }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div>\n                <router-link :to=\"item.url\">\n                    <img :src=\"item[config.image]\" class=\"image\">\n                </router-link>\n            </div> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
       href: item.url
     }, {
       "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
         return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-          "class": "text-sm p-2 image text-white flex flex-col justify-end bg-cover bg-center w-full h-full",
+          "class": "h-40 rounded-lg text-sm p-2 image text-white flex flex-col justify-end bg-cover bg-center w-full h-full",
           style: (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeStyle)('background-image:linear-gradient(to bottom, rgba(245, 246, 252, 0), rgb(0 0 0 / 73%)), url(' + item[$props.config.image] + ');')
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(item[$props.config.title]), 5
         /* TEXT, STYLE */
@@ -26618,7 +26637,7 @@ var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
   "class": "bg-gray-300 w-full h-10 border-t-2 border-b-2 border-black"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "text-center text-lg pt-1"
-}, "My Comic")])], -1
+}, "Purchased Comics")])], -1
 /* HOISTED */
 );
 
@@ -26640,20 +26659,22 @@ var _hoisted_6 = {
   "class": "px-5 py-5"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
+  var _component_grid = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("grid");
+
   var _component_horizontal_slider = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("horizontal-slider");
 
   var _component_app_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("app-layout");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_app_layout, null, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_1, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_grid, {
         items: $options.processToHorizontalSlider($data.comics.all),
         config: $data.config,
         objectCategory: "all",
         onNextPage: $options.nextPage
       }, null, 8
       /* PROPS */
-      , ["items", "config", "onNextPage"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
+      , ["items", "config", "onNextPage"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <horizontal-slider :items=\"processToHorizontalSlider(comics.all)\"\n                    :config=\"config\"\n                    objectCategory=\"all\"\n                    @nextPage=\"nextPage\"\n                ></horizontal-slider> ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
         items: $options.processToHorizontalSlider($data.comics.all),
         config: $data.config,
         objectCategory: "all",

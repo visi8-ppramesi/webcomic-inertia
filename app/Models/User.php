@@ -133,7 +133,7 @@ class User extends Authenticatable //implements MustVerifyEmail
         //then add comic to purchased list
         $comicObj = Comic::findOrFail($comicId);
         $currentPurchaseObj = json_decode($this->purchase_history, true);
-        $jsonString = 'purchase_history->' . $comicId;
+        // $jsonString = 'purchase_history->' . $comicId;
         if(array_key_exists($comicId, $currentPurchaseObj)){
             $currentChapter = $currentPurchaseObj[$comicId]['chapters'];
             $currentTransaction = $currentPurchaseObj[$comicId]['transactions'];
@@ -158,8 +158,9 @@ class User extends Authenticatable //implements MustVerifyEmail
             ];
         }
         $uid = $this->id;
+        $currentPurchaseObj[$comicId] = $purchaseObject;
         return self::where('id', $uid)->update([
-            $jsonString => $purchaseObject,
+            'purchase_history' => json_encode($currentPurchaseObj),
             'total_tokens' => $currentToken
         ]);
     }

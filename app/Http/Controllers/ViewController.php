@@ -124,11 +124,14 @@ class ViewController extends Controller
         $u = auth()->user();
         $subs = array_values(json_decode($u->subscriptions));
         $favs = array_values(json_decode($u->favorites));
+        $purchased = array_keys(json_decode($u->purchase_history, true));
         $comicSubs = Comic::whereIn('id', $subs)->get();
         $comicFaves = Comic::whereIn('id', $favs)->get();
+        $comicPurchased = Comic::whereIn('id', $purchased)->get();
         return Inertia::render('MyComicShow', [
             'subscriptions' => $comicSubs,
-            'favorites' => $comicFaves
+            'favorites' => $comicFaves,
+            'purchased' => $comicPurchased
         ]);
     }
 

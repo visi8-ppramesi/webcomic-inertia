@@ -180,6 +180,8 @@ export default {
         this.authors = this.comic.authors
         this.emitter.on('reloadComments', this.reloadComments)
 
+        localStorage.setItem('lastPage', JSON.stringify({routeName: 'web.comic', params: {comic: this.comic.id}}))
+
         // axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
         // .then((response) => {
         //     this.purchaseObj = response.data
