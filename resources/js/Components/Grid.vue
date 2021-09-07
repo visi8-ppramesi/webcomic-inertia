@@ -1,6 +1,6 @@
 <template>
     <div class="grid grid-cols-1 sm:grid-cols-5 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10 gap-2 flex-wrap overflow-x-auto overflow-x-hidden min-h-40">
-        <div v-for="(item, idx) in items.items" class="w-12 card mr-1 bg-gradient-to-t from-indigo-900 to-indigo-400 min-h-full min-w-full rounded-lg" :key="'item-' + idx">
+        <div v-for="(item, idx) in items.items" class="w-12 card mr-1 bg-gradient-to-t from-indigo-900 to-indigo-400 min-w-full rounded-lg" :key="'item-' + idx">
             <!-- <div>
                 <router-link :to="item.url">
                     <img :src="item[config.image]" class="image">

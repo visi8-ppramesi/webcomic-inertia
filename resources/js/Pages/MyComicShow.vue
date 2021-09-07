@@ -8,9 +8,9 @@
             </div>
             <div class="px-5 pt-5">
                 <grid
-                    :items="processToHorizontalSlider(comics.all)"
+                    :items="processItems(items.favorited, 'favorited')"
                     :config="config"
-                    objectCategory="all"
+                    objectCategory="favorited"
                     @nextPage="nextPage"
                 ></grid>
                 <!-- <horizontal-slider :items="processToHorizontalSlider(comics.all)"
@@ -27,11 +27,11 @@
                 </div>
             </div>
             <div class="px-5 pt-5">
-                <horizontal-slider :items="processToHorizontalSlider(comics.all)"
+                <!-- <horizontal-slider :items="processToHorizontalSlider(comics.all)"
                     :config="config"
                     objectCategory="all"
                     @nextPage="nextPage"
-                ></horizontal-slider>
+                ></horizontal-slider> -->
             </div>
         </div>
         <div>
@@ -41,11 +41,11 @@
                 </div>
             </div>
             <div class="px-5 py-5">
-                <horizontal-slider :items="processToHorizontalSlider(comics.all)"
+                <!-- <horizontal-slider :items="processToHorizontalSlider(comics.all)"
                     :config="config"
                     objectCategory="all"
                     @nextPage="nextPage"
-                ></horizontal-slider>
+                ></horizontal-slider> -->
             </div>
         </div>
     </app-layout>
@@ -57,23 +57,42 @@
     import AppLayout from '@/Layouts/AppLayout.vue'
     export default {
         name: 'mycomic',
-        props: ['subscriptions', 'favorites', 'purchased'],
+        props: ['subscribed', 'favorited', 'purchased'],
         components: {
             HorizontalSlider,
             Grid,
             AppLayout,
         },
         created() {
-            console.log(this.subscriptions)
-            this.shownTags.forEach((elem) => {
-                this.comics[elem] = {}
-                this.comics[elem].comics = []
-                this.getComics(route('api.comics.list', { ...this.query, where_tag: elem }), elem)
-            })
-            this.getComics(route('api.comics.list', this.query), 'all')
+            // console.log(this.subscriptions)
+            // this.shownTags.forEach((elem) => {
+            //     this.comics[elem] = {}
+            //     this.comics[elem].comics = []
+            //     this.getComics(route('api.comics.list', { ...this.query, where_tag: elem }), elem)
+            // })
+            // this.getComics(route('api.comics.list', this.query), 'all')
+
+            this.items.favorited = this.favorited.slice(0, 3)
+            this.items.subscribed = this.subscribed.slice(0, 3)
+            this.items.purchased = this.purchased.slice(0, 3)
         },
         data() {
             return {
+                items: {
+                    favorited: [],
+                    subscribed: [],
+                    purchased: [],
+                },
+                itemsCounts: {
+                    favorited: 3,
+                    subscribed: 3,
+                    purchased: 3,
+                },
+                nextPages: {
+                    favorited: true,
+                    subscribed: true,
+                    purchased: true
+                },
                 shownTags: [
                     'ipsum',
                     'lorem'
@@ -94,16 +113,16 @@
             }
         },
         methods: {
-            processToHorizontalSlider(comicObjects) {
+            processItems(comicObjects, category) {
                 let retVal = []
-                comicObjects.comics.forEach(element => {
+                comicObjects.forEach(element => {
                     retVal.push({
                         url: '/comic/' + element.id,
                         cover_url: element.cover_url,
                         title: element.title
                     })
                 });
-                return { items: retVal, nextPageUrl: comicObjects.nextPageUrl }
+                return { items: retVal, nextPageUrl: this.nextPages[category] }
             },
             getComics(url, category) {
                 axios.get(url)
@@ -125,8 +144,11 @@
                     })
             },
             nextPage(category) {
-                if (!this.comics[category].nextDisabled) {
-                    this.getComics(this.comics[category].nextPageUrl, category)
+                console.log(category)
+                this.itemsCounts[category] += 3
+                this.items[category] = this[category].slice(0, this.itemsCounts[category])
+                if(this.itemsCounts[category] > this.items[category].length){
+                    this.nextPages[category] = false
                 }
             },
             prevPage(category) {

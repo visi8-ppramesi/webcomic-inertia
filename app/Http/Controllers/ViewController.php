@@ -129,8 +129,8 @@ class ViewController extends Controller
         $comicFaves = Comic::whereIn('id', $favs)->get();
         $comicPurchased = Comic::whereIn('id', $purchased)->get();
         return Inertia::render('MyComicShow', [
-            'subscriptions' => $comicSubs,
-            'favorites' => $comicFaves,
+            'subscribed' => $comicSubs,
+            'favorited' => $comicFaves,
             'purchased' => $comicPurchased
         ]);
     }
