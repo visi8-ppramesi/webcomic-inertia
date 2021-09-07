@@ -2,11 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Setting;
 use App\Models\TokenTransaction;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 class TokenTransactionController extends Controller
 {
+    public function purchaseTokens(Request $request){
+        $validated = $request->validate([
+            'token_amount' => ['required', 'integer'],
+            'money_amount' => ['required', 'numeric']
+        ]);
+
+        $tokenPrices = Setting::getValue('token.prices');
+        $priceError = true;
+        foreach($tokenPrices as $key => $tokenPrice){
+            if($validated['token_amount'] == $tokenPrice['amount'] && $validated['money_amount'] == $tokenPrice['price']){
+                $priceError = false;
+            }
+        }
+        if($priceError){
+            throw ValidationException::withMessages(['field_name' => 'token price point does not exist.']);
+        }
+
+        $u = auth()->user();
+        return response()->json($u->purchaseToken($validated['token_amount'], $validated['money_amount'], 'testing'), 200);
+    }
+
     /**
      * Display a listing of the resource.
      *

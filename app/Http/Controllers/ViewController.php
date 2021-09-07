@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Query;
 use App\Models\Author;
 use App\Models\Chapter;
 use App\Models\Comic;
@@ -16,7 +17,10 @@ use tizis\laraComments\UseCases\CommentService;
 class ViewController extends Controller
 {
     public function viewMyTokensShow(){
-        return Inertia::render('MyTokensShow');
+        $tokenPrices = Setting::getValue('token.prices');
+        return Inertia::render('MyTokensShow', [
+            'prices' => $tokenPrices
+        ]);
     }
 
     public function viewDashboard(){
@@ -65,6 +69,16 @@ class ViewController extends Controller
                 $param['ar'] = request('ar');
             };
             return Inertia::render('PageShow', $param);
+        }else{
+            $comic = $chapter->comic;
+            $comic->load(['chapters', 'authors']);
+            return Inertia::render('ComicShow', [
+                'user' => $u,
+                'comic' => $comic,
+                'comment_key' => $comic->getEncryptedKey(),
+                'comments' => $comic->commentsWithChildrenAndCommenter()->parentless()->get(),
+                'redirect_error' => 'chapter_unpurchased'
+            ]);
         }
     }
 
@@ -78,9 +92,20 @@ class ViewController extends Controller
     }
 
     public function viewSearchShow(Request $request){
-        return Inertia::render('SearchShow', [
-
-        ]);
+        if($request->has('search')){
+            $searchTerm = $request->input('search');
+            $comicResult = Query::buildWheres(Comic::class, $searchTerm, ['title', 'tags', 'genres'])->paginate(12);
+            $authorResult = Query::buildWheres(Author::class, $searchTerm, ['name'])->paginate(12);
+            return Inertia::render('SearchShow', [
+                'results' => [
+                    'comics' => $comicResult,
+                    'authors' => $authorResult,
+                ],
+                'query' => $searchTerm
+            ]);
+        }else{
+            return Inertia::render('SearchShow');
+        }
     }
 
     public function viewAuthorShow(Author $author){
@@ -96,8 +121,14 @@ class ViewController extends Controller
     }
 
     public function viewMyComicShow(){
+        $u = auth()->user();
+        $subs = array_values(json_decode($u->subscriptions));
+        $favs = array_values(json_decode($u->favorites));
+        $comicSubs = Comic::whereIn('id', $subs)->get();
+        $comicFaves = Comic::whereIn('id', $favs)->get();
         return Inertia::render('MyComicShow', [
-
+            'subscriptions' => $comicSubs,
+            'favorites' => $comicFaves
         ]);
     }
 
@@ -120,6 +151,9 @@ class ViewController extends Controller
     }
 
     public function viewPurchaseTokens(){
-
+        $tokenPrices = Setting::getValue('token.prices');
+        return Inertia::render('MyTokensShow', [
+            'prices' => $tokenPrices
+        ]);
     }
 }

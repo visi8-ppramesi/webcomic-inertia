@@ -86,6 +86,7 @@
                     <div class="px-2 pt-2 pb-3 space-y-1">
                         <Link :href="route('web.dashboard')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Dashboard</Link>
                         <Link :href="route('web.mycomics')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">My Comics</Link>
+                        <Link :href="route('web.purchasetokens')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Purchase Tokens</Link>
                         <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
                         <!-- <router-link @click.native="mobileMenuOpen = false" :to="{name: 'dashboard'}" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Dashboard</router-link>
                         <router-link :to="{}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Comics</router-link>

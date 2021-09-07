@@ -9,7 +9,7 @@
                 </div><!-- make it linkable later -->
                 <div class="flex flex-row justify-between">
                     <div class="text-2xl font-bold w-2/3">{{comic.title}}</div>
-                    <button class="w-fit-content h-fit-content mt-3 inline-flex items-center justify-center px-2 py-1 rounded-full text-gray-50 bg-green-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="favoriteComic">
+                    <button :class="{'bg-transparent ring-white ring-inset ring-2': subscribed, 'bg-green-400': !subscribed}" class="animated w-fit-content h-fit-content inline-flex items-center justify-center px-2 py-1 rounded-full text-gray-50 bg-green-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="subscribeComic">
                         Subscribe
                     </button>
                 </div>
@@ -39,7 +39,7 @@
             <div class="divide-y divide-black">
                 <div class="flex flex-row h-20 bg-indigo-800 text-white" v-for="(chapter, idx) in chapters" :key="'chapter-'+idx">
                     <div class="flex-none w-1/5 lg:w-24">
-                        <img class="h-20" :src="chapter.image_url" alt="">
+                        <img class="h-full w-full" :src="chapter.image_url" alt="">
                     </div>
                     <div class="flex-grow flex flex-col p-3 w-2/5 lg:w-2" @click="goToChapter(chapter.id)">
                         <div>Ep. {{chapter.chapter}}</div>
@@ -52,7 +52,7 @@
                             <div class="text-xs">{{chapter.release_date}}</div>
                         </div>
                     </div>
-                    <div class="w-2/5 flex justify-end items-end mb-7 mr-5" >
+                    <div class="w-2/5 flex justify-center items-center" >
                         <button v-if="checkChapter(purchaseObj.chapters, chapter.id)" class="text-xs items-center min-h-8 w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="openModal(chapter)">Buy Ep. {{chapter.chapter}}</button>
                         <template v-else>
                             <button class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter.id, true)">Read Ep. {{chapter.chapter}} With AR</button>
@@ -129,6 +129,7 @@ export default {
         return {
             showArOption: false,
             favorited: false,
+            subscribed: false,
             arSelected: false,
             user: null,
             modal: false,
@@ -147,6 +148,13 @@ export default {
         }
     },
     created(){
+        if(_.has(this.$page.props, 'redirect_error')){
+            this.swal.fire({
+                icon: "error",
+                title: "You don\'t own this chapter!",
+                text: "Please purchase the chapter to read it!",
+            })
+        }
         this.comments = this.$page.props.comments
         this.comic = usePage().props.value.comic
         this.tags = JSON.parse(this.comic.tags)
@@ -167,6 +175,7 @@ export default {
         .then((response) => {
             this.bookmark = response.data
         })
+        this.subscribed = _.includes(JSON.parse(this.user.subscriptions).map(x => +x), this.comic.id)
         this.favorited = _.includes(JSON.parse(this.user.favorites).map(x => +x), this.comic.id)
         this.authors = this.comic.authors
         this.emitter.on('reloadComments', this.reloadComments)
@@ -209,6 +218,12 @@ export default {
             return axios.get(route('api.comic.fetch.comments', {comic: this.comic.id}))
             .then((response) => {
                 this.comments = response.data
+            })
+        },
+        subscribeComic(){
+            return axios.get(route('api.comic.subscribe', {comicId: this.comic.id}))
+            .then((response) => {
+                this.subscribed = _.includes(response.data.map(x => +x), this.comic.id)
             })
         },
         favoriteComic(){
@@ -388,7 +403,10 @@ export default {
     margin-left:-17px;
 }
 .animated{
-    transition: fill 0.1s;
+    -webkit-transition: all 0.2s 0s ease;
+    -moz-transition: all 0.2s 0s ease;
+    -o-transition: all 0.2s 0s ease;
+    transition: all 0.2s 0s ease;
 }
 .fill-white{
     fill:white;

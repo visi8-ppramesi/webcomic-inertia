@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\ComicController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\TokenTransactionController;
 use App\Models\Chapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -33,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     // Route::get('/logout', [AuthController::class, 'logout'])->name('api.logout');
 
+    Route::get('/comic/subscribe/{comicId}', [ComicController::class, 'toggleSubscribeComic'])->name('api.comic.subscribe');
     Route::get('/comic/favorite/{comicId}', [ComicController::class, 'toggleFavoriteComic'])->name('api.comic.favorite');
     Route::get('/comic/chapters/{comicId}', [ComicController::class, 'getComicChapters'])->name('api.comic.get.chapters');
     Route::get('/chapter/bookmark/{chapter}', [ChapterController::class, 'bookmarkChapter'])->name('api.chapter.bookmark');
@@ -63,6 +66,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/comics/purchase', [ComicController::class, 'purchaseComics'])->name('api.comics.purchase');
     Route::post('/chapter/purchase', [ChapterController::class, 'purchaseChapter'])->name('api.chapter.purchase');
     Route::get('/previews/{comicId}', [ChapterController::class, 'index'])->name('api.comic.get.previews');
+    Route::post('/tokens/purchase', [TokenTransactionController::class, 'purchaseTokens'])->name('api.tokens.purchase');
 });
 
 Route::middleware('role:visitor')->group(function(){
@@ -81,3 +85,4 @@ Route::get('/authors', [AuthorController::class, 'index'])->name('api.authors.li
 Route::get('/chapter/checkar/{chapter}', [ChapterController::class, 'checkAr'])->name('api.chapter.check.ar');
 Route::get('/comic/comments/{comic}', [ComicController::class, 'fetchComments'])->name('api.comic.fetch.comments');
 Route::get('/chapter/comments/{chapter}', [ChapterController::class, 'fetchComments'])->name('api.chapter.fetch.comments');
+Route::get('/search', [SearchController::class, 'fetchSearch'])->name('api.search');

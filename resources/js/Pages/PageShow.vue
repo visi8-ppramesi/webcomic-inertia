@@ -84,7 +84,11 @@ export default {
     },
     methods:{
         changeChapter(newchapter){
-            this.$inertia.visit(route('web.chapter', {comic: this.comic.id, chapter: newchapter}))
+            this.$inertia.visit(route('web.chapter', {comic: this.comic.id, chapter: newchapter}), {
+                onError: (e) => {
+                    console.log('adfasdfadsfasdf')
+                }
+            })
             // this.fetchPages(this.$route.params.comicId, this.selectedChapter)
             // this.$router.push({name: 'pageShow',
             //     params: {
@@ -170,6 +174,7 @@ export default {
         // window.addEventListener('scroll', this.handleScroll)
     },
     created(){
+        console.log(this.$page.props.error)
         this.comments = this.$page.props.comments
         this.isAr = this.ar === 'true'
         this.chapters = this.comic.chapters

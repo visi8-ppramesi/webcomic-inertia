@@ -35,9 +35,16 @@ class SetupDatabase extends Migration
 
         $user->assignRole(Acl::ROLE_ADMIN);
 
-        Setting::create(['name' => 'dashboard.tags', 'values' => json_encode([])]);
-        Setting::create(['name' => 'dashboard.genres', 'values' => json_encode([])]);
-        Setting::create(['name' => 'dashboard.banners', 'values' => json_encode([])]);
+        Setting::setValue('dashboard.tags', []);
+        Setting::setValue('dashboard.genres', []);
+        Setting::setValue('dashboard.banners', []);
+        Setting::setValue('token.prices', [
+            ['price' => 5000, 'amount' => 50],
+            ['price' => 7000, 'amount' => 100],
+            ['price' => 10000, 'amount' => 150],
+            ['price' => 12000, 'amount' => 200],
+            ['price' => 15000, 'amount' => 250, 'special_tag' => 'best_offer'],
+        ]);
     }
 
     /**

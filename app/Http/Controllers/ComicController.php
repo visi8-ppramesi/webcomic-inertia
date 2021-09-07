@@ -68,6 +68,11 @@ class ComicController extends Controller
         return response()->json($u->toggleFavoriteComic($comicId));
     }
 
+    public function toggleSubscribeComic($comicId){
+        $u = auth()->user();
+        return response()->json($u->toggleSubscribeComic($comicId));
+    }
+
     /**
      * Display a listing of the resource.
      *

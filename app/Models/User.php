@@ -165,7 +165,7 @@ class User extends Authenticatable //implements MustVerifyEmail
     }
 
     public function subscribeComic($comicId){
-        $currentFave = json_decode($this->subscriptions, true);
+        $currentFave = array_values(json_decode($this->subscriptions, true));
         if(in_array($comicId, $currentFave)){
             $currentFave[] = $comicId;
         }else{
@@ -203,6 +203,28 @@ class User extends Authenticatable //implements MustVerifyEmail
         return $currentFave;
     }
 
+    public function toggleSubscribeComic($objectId){
+        $currentSubs = array_values(json_decode($this->subscriptions));
+        if(!in_array($objectId, $currentSubs)){
+            $currentSubs[] = $objectId;
+        }else{
+            $currentSubs = array_diff($currentSubs, [$objectId]);
+        }
+        $uid = $this->id;
+        self::where('id', $uid)->update(['subscriptions' => $currentSubs]);
+        return $currentSubs;
+    }
+
+    public function checkTokenAmount(){
+        $transactions = TokenTransaction::where('user_id', $this->id)->get();
+        $total = 0;
+        foreach($transactions as $key => $transaction){
+            $number = json_decode($transaction->descriptor, true)['type'] == 'purchase_comic' ? $transaction->token_amount * -1 : $transaction->token_amount;
+            $total += $number;
+        }
+        return [$total, $this->total_tokens];
+    }
+
     public function getComicBookmarkedPage($comicId){
         $bookmark = json_decode($this->bookmark, true);
         return !empty($bookmark[$comicId]) ? $bookmark[$comicId] : [];
@@ -230,6 +252,6 @@ class User extends Authenticatable //implements MustVerifyEmail
             'descriptor' => json_encode($descriptor)
         ]);
         $this->total_tokens += $tokenAmount;
-        $this->save();
+        return $this->save();
     }
 }
