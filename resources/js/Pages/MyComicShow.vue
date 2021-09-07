@@ -13,11 +13,6 @@
                     objectCategory="favorited"
                     @nextPage="nextPage"
                 ></grid>
-                <!-- <horizontal-slider :items="processToHorizontalSlider(comics.all)"
-                    :config="config"
-                    objectCategory="all"
-                    @nextPage="nextPage"
-                ></horizontal-slider> -->
             </div>
         </div>
         <div>
@@ -27,11 +22,12 @@
                 </div>
             </div>
             <div class="px-5 pt-5">
-                <!-- <horizontal-slider :items="processToHorizontalSlider(comics.all)"
+                <grid
+                    :items="processItems(items.purchased, 'purchased')"
                     :config="config"
-                    objectCategory="all"
+                    objectCategory="purchased"
                     @nextPage="nextPage"
-                ></horizontal-slider> -->
+                ></grid>
             </div>
         </div>
         <div>
@@ -41,25 +37,24 @@
                 </div>
             </div>
             <div class="px-5 py-5">
-                <!-- <horizontal-slider :items="processToHorizontalSlider(comics.all)"
+                <grid
+                    :items="processItems(items.subscribed, 'subscribed')"
                     :config="config"
-                    objectCategory="all"
+                    objectCategory="subscribed"
                     @nextPage="nextPage"
-                ></horizontal-slider> -->
+                ></grid>
             </div>
         </div>
     </app-layout>
 </template>
 
 <script>
-    import HorizontalSlider from '../Components/HorizontalSlider.vue'
     import Grid from '../Components/Grid.vue'
     import AppLayout from '@/Layouts/AppLayout.vue'
     export default {
         name: 'mycomic',
         props: ['subscribed', 'favorited', 'purchased'],
         components: {
-            HorizontalSlider,
             Grid,
             AppLayout,
         },
@@ -74,7 +69,12 @@
 
             this.items.favorited = this.favorited.slice(0, 3)
             this.items.subscribed = this.subscribed.slice(0, 3)
-            this.items.purchased = this.purchased.slice(0, 3)
+            this.items.purchased = this.purchased.slice(0, 3);
+            ['subscribed', 'favorited', 'purchased'].forEach((key) => {
+                if(this.itemsCounts[key] >= this[key].length){
+                    this.nextPages[key] = false
+                }
+            })
         },
         data() {
             return {
