@@ -8,7 +8,9 @@ use Illuminate\Http\Request;
 class ChapterController extends Controller
 {
     public function fetchComments(Chapter $chapter){
-        return response()->json($chapter->commentsWithChildrenAndCommenter()->parentless()->get(), 200);
+        $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();
+
+        return response()->json($comments, 200);
     }
 
     public function bookmarkChapter(Chapter $chapter){

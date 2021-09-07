@@ -255,4 +255,11 @@ class User extends Authenticatable //implements MustVerifyEmail
         $this->total_tokens += $tokenAmount;
         return $this->save();
     }
+
+    public function canDelete($item){
+        if(get_class($item) == Comment::class){
+            return $item->commenter_id == $this->id || $this->can('manage comment');
+        }
+        return false;
+    }
 }

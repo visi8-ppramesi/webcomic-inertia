@@ -42,6 +42,8 @@ final class Acl
     const PERMISSION_ARTICLE_MANAGE = 'manage article';
     const PERMISSION_PERMISSION_MANAGE = 'manage permission';
 
+    const PERMISSION_COMMENT_MANAGE = 'manage comment';
+
     /**
      * @param array $exclusives Exclude some permissions from the list
      * @return array

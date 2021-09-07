@@ -20,7 +20,7 @@ return [
         'root' => 'api',
         'group' => 'comments'
     ],
-    'policy_prefix' => 'comments',
+    'policy_prefix' => 'comments_custom',
     'testing' => [
         'seeding' => [
             'commentable' => '\App\Post',

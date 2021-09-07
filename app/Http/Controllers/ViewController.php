@@ -39,11 +39,14 @@ class ViewController extends Controller
     public function viewComicShow(Comic $comic){
         $u = auth()->user();
         $comic->load(['chapters', 'authors']);
+
+        $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();;
+
         return Inertia::render('ComicShow', [
             'user' => $u,
             'comic' => $comic,
             'comment_key' => $comic->getEncryptedKey(),
-            'comments' => $comic->commentsWithChildrenAndCommenter()->parentless()->get()
+            'comments' => $comments
         ]);
     }
 
@@ -58,12 +61,14 @@ class ViewController extends Controller
         $u = auth()->user();
         $comic->load('chapters');
         if($u->checkChapterPurchased($chapter->id)){
+            $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();;
+
             $param = [
                 'comic' => $comic,
                 'chapter' => $chapter,
                 'pages' => $chapter->pages,
                 'comment_key' => $chapter->getEncryptedKey(),
-                'comments' => $chapter->commentsWithChildrenAndCommenter()->parentless()->get()
+                'comments' => $comments
             ];
             if(request()->has('ar')){
                 $param['ar'] = request('ar');
@@ -72,11 +77,14 @@ class ViewController extends Controller
         }else{
             $comic = $chapter->comic;
             $comic->load(['chapters', 'authors']);
+
+            $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();;
+
             return Inertia::render('ComicShow', [
                 'user' => $u,
                 'comic' => $comic,
                 'comment_key' => $comic->getEncryptedKey(),
-                'comments' => $comic->commentsWithChildrenAndCommenter()->parentless()->get(),
+                'comments' => $comments,
                 'redirect_error' => 'chapter_unpurchased'
             ]);
         }

@@ -46,7 +46,7 @@
                 </button>
             </div>
 
-            <div class="p-5 text-white">
+            <div class="text-white">
                 <add-new-comment
                     :commentKey="$page.props.comment_key"
                 />
