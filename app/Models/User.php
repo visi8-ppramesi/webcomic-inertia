@@ -208,7 +208,7 @@ class User extends Authenticatable //implements MustVerifyEmail
             $currentFave[$type][] = $objectId;
             $returnType = 'increment';
         }else{
-            $currentFave[$type] = array_diff($currentFave[$type], [$objectId]);
+            $currentFave[$type] = array_values(array_diff($currentFave[$type], [$objectId]));
             $returnType = 'decrement';
         }
         $uid = $this->id;

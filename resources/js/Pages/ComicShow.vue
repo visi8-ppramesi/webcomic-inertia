@@ -52,15 +52,15 @@
                         <img class="h-full w-full" :src="chapter.image_url" alt="">
                     </div>
                     <!-- <div class="flex-grow flex flex-col p-3 w-2/5 lg:w-2" @click="goToChapter(chapter.id)"> -->
-                    <div class="flex-grow flex flex-col p-3 w-2/5 lg:w-2">
-                        <div class="flex flex-row w-100">
-                            <div>Ep. {{chapter.chapter}}</div>
-                            <div class="text-xs py-1 ml-2">{{chapter.release_date}}</div>
+                    <div class="flex-grow flex flex-col py-3 pl-3 w-2/5 lg:w-2">
+                        <div class="w-100">
+                            <span class="text-sm">Ep. {{chapter.chapter}}</span>
+                            <span class="text-xs ml-2">{{chapter.release_date}}</span>
                         </div>
                         <div class="flex flex-row mt-2">
                             <div class="flex flex-row">
                                 <button @click="favoriteChapter(chapter.id)">
-                                    <svg :class="chapterFavorited.includes(chapter.id) ? 'fill-white' : 'fill-none'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <svg :class="chapterFavorited.includes(chapter.id) ? 'fill-white' : 'fill-none'" xmlns="http://www.w3.org/2000/svg" class="animated h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                 </button>
