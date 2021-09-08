@@ -117,6 +117,7 @@ export default {
     },
     props: ['tags', 'genres', 'banners'],
     created(){
+        localStorage.removeItem('lastPage')
         this.shownTags = usePage().props.value.tags
         this.shownTags.forEach((elem) => {
             this.comics[elem] = {}

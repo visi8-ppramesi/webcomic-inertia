@@ -101,16 +101,16 @@ class User extends Authenticatable //implements MustVerifyEmail
         return Comic::whereIn('id', $purchasedId)->get();
     }
 
-    public function purchaseChapters($comicId, $chapters, $ar = []){//to be called after sucessful payment
+    public function purchaseChapter($comicId, $chapter, $ar = false){//to be called after sucessful payment
         //create token transaction first
         $itemsPrices = [];
         $tokenAmount = 0;
-        Chapter::whereIn('id', $chapters)->get()->map(function($item)use(&$itemsPrices, &$tokenAmount){
+        Chapter::where('id', $chapter)->get()->map(function($item)use(&$itemsPrices, &$tokenAmount){
             $itemsPrices[$item->id] = $item->token_price;
             $tokenAmount += $item->token_price;
         });
         $currentToken = $this->total_tokens - $tokenAmount;
-        if($this->checkChapterPurchased($chapters[0])){
+        if($this->checkChapterPurchased($chapter)){
             return -1;
         }
         if($currentToken <= 0){
@@ -120,7 +120,7 @@ class User extends Authenticatable //implements MustVerifyEmail
         $descriptor = [
             'date' => \Carbon\Carbon::now(),
             'type' => 'purchase_comic',
-            'items' => $chapters,
+            'items' => $chapter,
             'item_prices' => $itemsPrices
         ];
 
@@ -136,24 +136,29 @@ class User extends Authenticatable //implements MustVerifyEmail
         // $jsonString = 'purchase_history->' . $comicId;
         if(array_key_exists($comicId, $currentPurchaseObj)){
             $currentChapter = $currentPurchaseObj[$comicId]['chapters'];
+            $arArr = $currentPurchaseObj[$comicId]['ar'];
             $currentTransaction = $currentPurchaseObj[$comicId]['transactions'];
-            $currentChapter = array_merge($currentChapter, $chapters);
+            $currentChapter = array_merge($currentChapter, [$chapter]);
             $transactions = array_merge($currentTransaction, [$transaction->id]);
+            if($ar){
+                $arArr[] = $chapter;
+            }
             $purchaseObject = [
                 'price' => $comicObj->price,
-                'ar' => $ar,
+                'ar' => $arArr,
                 'id' => $comicId,
                 'date' => now(),
                 'chapters' => $currentChapter,
                 'transactions' => $transactions
             ];
         }else{
+            $arArr = $ar ? [$chapter] : [];
             $purchaseObject = [
                 'price' => $comicObj->price,
-                'ar' => $ar,
+                'ar' => $arArr,
                 'id' => $comicId,
                 'date' => now(),
-                'chapters' => $chapters,
+                'chapters' => [$chapter],
                 'transactions' => [$transaction->id]
             ];
         }
@@ -179,12 +184,16 @@ class User extends Authenticatable //implements MustVerifyEmail
     public function bookmarkChapter($chapterId){
         $comicId = Chapter::findOrFail($chapterId)->comic_id;
         $currentBookmark = json_decode($this->bookmark, true);
-        $currentBookmark[$comicId] = $chapterId;
-        $uid = $this->id;
-        return self::where('id', $uid)->update(['bookmark' => $currentBookmark]);
+        if($currentBookmark[$comicId] > $chapterId){
+            $currentBookmark[$comicId] = $chapterId;
+            $uid = $this->id;
+            return self::where('id', $uid)->update(['bookmark' => $currentBookmark]);
+        }else{
+            return 0;
+        }
     }
 
-    public function toggleFavoriteComic($objectId, $type = 'comic'){
+    public function toggleFavorite($objectId, $type = 'comics'){
         /*
             structure should be:
             {
@@ -193,15 +202,18 @@ class User extends Authenticatable //implements MustVerifyEmail
             }
             so initialized to {comic:[], chapter: []}
         */
-        $currentFave = array_values(json_decode($this->favorites));
-        if(!in_array($objectId, $currentFave)){
-            $currentFave[] = $objectId;
+        $currentFave = json_decode($this->favorites, true);
+        $returnType = '';
+        if(!in_array($objectId, $currentFave[$type])){
+            $currentFave[$type][] = $objectId;
+            $returnType = 'increment';
         }else{
-            $currentFave = array_diff($currentFave, [$objectId]);
+            $currentFave[$type] = array_diff($currentFave[$type], [$objectId]);
+            $returnType = 'decrement';
         }
         $uid = $this->id;
-        self::where('id', $uid)->update(['favorites' => $currentFave]);
-        return $currentFave;
+        self::where('id', $uid)->update(['favorites' => json_encode($currentFave)]);
+        return ['favorite_obj' => $currentFave, 'type' => $returnType];
     }
 
     public function toggleSubscribeComic($objectId){
@@ -228,7 +240,7 @@ class User extends Authenticatable //implements MustVerifyEmail
 
     public function getComicBookmarkedPage($comicId){
         $bookmark = json_decode($this->bookmark, true);
-        return !empty($bookmark[$comicId]) ? $bookmark[$comicId] : [];
+        return !empty($bookmark[$comicId]) ? $bookmark[$comicId] : null;
     }
 
     public function purchaseToken($tokenAmount, $moneyValue, $paymentType){

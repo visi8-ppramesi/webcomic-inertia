@@ -9,9 +9,9 @@ use Illuminate\Support\Str;
 
 class PageController extends Controller
 {
-    public function getBookmarkedPage($comicId){
+    public function getBookmarkedPage($comic){
         $u = auth()->user();
-        return response()->json($u->getComicBookmarkedPage($comicId));
+        return response()->json($u->getComicBookmarkedPage($comic));
     }
 
     // public function bookmarkPage($pageId){
@@ -23,8 +23,8 @@ class PageController extends Controller
         return response()->json(['config' => $page->config, 'scene' => $page->scene], 200);
     }
 
-    public function getComicPages($comicId, $chapter){
-        $pages = Page::where('comic_id', $comicId)->where('chapter_id', $chapter)->orderBy('section')->get();
+    public function getComicPages($comic, $chapter){
+        $pages = Page::where('comic_id', $comic)->where('chapter_id', $chapter)->orderBy('section')->get();
 
         return response()->json($pages, 200);
     }

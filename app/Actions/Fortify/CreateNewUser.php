@@ -35,7 +35,7 @@ class CreateNewUser implements CreatesNewUsers
             'read_history' => '[]',
             'total_tokens' => 0,
             'subscriptions' => '[]',
-            'favorites' => '[]',
+            'favorites' => json_encode(['comics' => [], 'chapters' => []]),
             'bookmark' => '{}'
         ]);
     }

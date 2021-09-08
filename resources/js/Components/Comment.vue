@@ -90,12 +90,12 @@ export default {
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
-                    axios.delete(route('comments.delete', {comment: id}))
+                    axios.delete(route('api.comment.delete', {comment: id}))
                     .then((response) => {
                         this.emitter.emit('reloadComments')
                         swalWithBootstrapButtons.fire(
                             'Deleted!',
-                            'Your file has been deleted.',
+                            'Your comment has been deleted.',
                             'success'
                         )
                     })
@@ -104,7 +104,7 @@ export default {
                 ) {
                     swalWithBootstrapButtons.fire(
                         'Cancelled',
-                        'Your imaginary file is safe :)',
+                        'Your comment is safe :)',
                         'error'
                     )
                 }

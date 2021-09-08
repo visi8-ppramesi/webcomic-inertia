@@ -1,16 +1,16 @@
 <template>
-    <div>
+    <app-layout>
         <div class="rounded-xl m-5 bg-gray-200 bg-opacity-70 border border-indigo-600">
             <div class="flex flex-row p-5">
                 <div>
-                    <img class="w-24 h-36" :src="this.authors.profile_picture_url" />
+                    <img class="w-24 h-36" :src="author.profile_picture_url" />
                 </div>
                 <div>
                     <div class="ml-4 text-2xl font-bold">
-                        {{authors.name}}
+                        {{author.name}}
                     </div>
                     <div class="ml-4 text-lg mt-3">
-                        {{authors.email}}
+                        {{author.email}}
                     </div>
                     <div>
                         <div class="ml-4 mt-3 text-sm">
@@ -26,8 +26,8 @@
                 </div>
             </div>
             <div class="p-5">
-                <div class="text-xl font-bold">About Authors :</div>
-                <div>{{authors.description}}</div>
+                <div class="text-xl font-bold">About Author :</div>
+                <div>{{author.description}}</div>
             </div>
             <div class="p-5">
                 <div class="text-xl font-bold">Author Books :</div>
@@ -41,7 +41,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </app-layout>
 </template>
 
 <script>
@@ -53,12 +53,13 @@
             HorizontalSlider,
             AppLayout
         },
+        props: ['author'],
         data() {
             return {
                 facebookIcon: require('../../icons/facebook.png'),
                 instagramIcon: require('../../icons/instagram.png'),
                 twitterIcon: require('../../icons/twitter.png'),
-                authors: [],
+                // author: [],
                 shownTags: [
                     'asdf',
                     'lorem'
@@ -85,10 +86,10 @@
                 this.getComics(route('api.comics.list', { ...this.query, where_tag: elem }), elem)
             })
             this.getComics(route('api.comics.list', this.query), 'all')
-            axios.get(route('api.author.show', { author: this.$route.params.authorId }))
-                .then((response) => {
-                    this.authors = response.data
-                })
+            // axios.get(route('api.author.show', { author: this.$route.params.authorId }))
+            //     .then((response) => {
+            //         this.authors = response.data
+            //     })
         },
         methods: {
             processToHorizontalSlider(comicObjects) {

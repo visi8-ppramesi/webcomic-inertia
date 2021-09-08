@@ -20,7 +20,7 @@
             </div>
             <template v-for="(page, idx) in pages">
                 <div v-if="page.id in scenePages && isAr" :class="{glow: shownClass['ar-' + page.id], 'fill-width': !shownClass['ar-' + page.id]}" class="w-100 glow-animation" :key="'img-' + idx" :id="'ar-' + page.id">
-                    <Link :href="{name: 'sceneShow', params: {pageId: page.id}}">
+                    <Link :href="route('web.scene', {page: page.id})">
                         <img class="lg:object-fill lg:w-full" :src="page.image_url">
                     </Link>
                 </div>
@@ -176,7 +176,7 @@ export default {
     created(){
         console.log(this.$page.props.error)
         this.comments = this.$page.props.comments
-        this.isAr = this.ar === 'true'
+        this.isAr = this.ar === '1'
         this.chapters = this.comic.chapters
         this.prevEnabled = this.chapter.id != this.chapters[0].id
         this.nextEnabled = this.chapter.id != this.chapters[this.chapters.length - 1].id

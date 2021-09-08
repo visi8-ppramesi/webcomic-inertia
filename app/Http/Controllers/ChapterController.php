@@ -7,6 +7,17 @@ use Illuminate\Http\Request;
 
 class ChapterController extends Controller
 {
+    public function toggleFavoriteChapter(Chapter $chapter){
+        $u = auth()->user();
+        $fav = $u->toggleFavorite($chapter->id, 'chapters');
+        if($fav['type'] == 'increment'){
+            $chapter->increment('favorites_count');
+        }else if($fav['type'] == 'decrement'){
+            $chapter->decrement('favorites_count');
+        }
+        return response()->json($fav['favorite_obj']);
+    }
+
     public function fetchComments(Chapter $chapter){
         $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();
 
@@ -27,11 +38,11 @@ class ChapterController extends Controller
         $cpt->comic->id;
         $u = auth()->user();
         if($validated['ar']){
-            $ar = [$validated['chapter'] => true];
+            $ar = true;
         }else{
-            $ar = [];
+            $ar = false;
         }
-        $purchased = $u->purchaseChapters($cpt->comic->id, [$validated['chapter']], $ar);
+        $purchased = $u->purchaseChapter($cpt->comic->id, $validated['chapter'], $ar);
         return response()->json(['status' => $purchased], 200);
     }
 

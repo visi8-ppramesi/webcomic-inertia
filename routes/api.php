@@ -6,6 +6,7 @@ use App\Http\Controllers\ComicController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TokenTransactionController;
+use App\Http\Controllers\CommentController;
 use App\Models\Chapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,12 +36,13 @@ Route::middleware('auth:sanctum')->group(function(){
 
     // Route::get('/logout', [AuthController::class, 'logout'])->name('api.logout');
 
-    Route::get('/comic/subscribe/{comicId}', [ComicController::class, 'toggleSubscribeComic'])->name('api.comic.subscribe');
-    Route::get('/comic/favorite/{comicId}', [ComicController::class, 'toggleFavoriteComic'])->name('api.comic.favorite');
-    Route::get('/comic/chapters/{comicId}', [ComicController::class, 'getComicChapters'])->name('api.comic.get.chapters');
+    Route::get('/comic/subscribe/{comic}', [ComicController::class, 'toggleSubscribeComic'])->name('api.comic.subscribe');
+    Route::get('/comic/favorite/{comic}', [ComicController::class, 'toggleFavoriteComic'])->name('api.comic.favorite');
+    Route::get('/chapter/favorite/{chapter}', [ChapterController::class, 'toggleFavoriteChapter'])->name('api.chapter.favorite');
+    Route::get('/comic/chapters/{comic}', [ComicController::class, 'getComicChapters'])->name('api.comic.get.chapters');
     Route::get('/chapter/bookmark/{chapter}', [ChapterController::class, 'bookmarkChapter'])->name('api.chapter.bookmark');
 
-    Route::get('/pages/{comicId}/{chapter}/', [PageController::class, 'getComicPages'])->name('api.pages.show');
+    Route::get('/pages/{comic}/{chapter}/', [PageController::class, 'getComicPages'])->name('api.pages.show');
     Route::get('/scene/{page}', [PageController::class, 'getPageScene'])->name('api.page.show.scene');
 
     Route::get('/comic/{comic}', [ComicController::class, 'show'])->name('api.comic.show');
@@ -61,12 +63,14 @@ Route::middleware('auth:sanctum')->group(function(){
 
     Route::get('/user/favorites', [ComicController::class, 'getFavorites'])->name('api.user.show.favorites');
 
-    Route::get('/comic/bookmark/check/{comicId}', [ComicController::class, 'checkBookmarked'])->name('api.comic.check.bookmark');
-    Route::get('/comic/purchased/check/{comicId}', [ComicController::class, 'checkPurchased'])->name('api.comic.check.purchased');
+    Route::get('/comic/bookmark/check/{comic}', [ComicController::class, 'checkBookmarked'])->name('api.comic.check.bookmark');
+    Route::get('/comic/purchased/check/{comic}', [ComicController::class, 'checkPurchased'])->name('api.comic.check.purchased');
     Route::post('/comics/purchase', [ComicController::class, 'purchaseComics'])->name('api.comics.purchase');
     Route::post('/chapter/purchase', [ChapterController::class, 'purchaseChapter'])->name('api.chapter.purchase');
-    Route::get('/previews/{comicId}', [ChapterController::class, 'index'])->name('api.comic.get.previews');
+    Route::get('/previews/{comic}', [ChapterController::class, 'index'])->name('api.comic.get.previews');
     Route::post('/tokens/purchase', [TokenTransactionController::class, 'purchaseTokens'])->name('api.tokens.purchase');
+
+    Route::delete('/comment/{comment}', [CommentController::class, 'destroy'])->name('api.comment.delete');
 });
 
 Route::middleware('role:visitor')->group(function(){

@@ -19302,15 +19302,15 @@ __webpack_require__.r(__webpack_exports__);
         reverseButtons: true
       }).then(function (result) {
         if (result.isConfirmed) {
-          axios["delete"](route('comments.delete', {
+          axios["delete"](route('api.comment.delete', {
             comment: id
           })).then(function (response) {
             _this.emitter.emit('reloadComments');
 
-            swalWithBootstrapButtons.fire('Deleted!', 'Your file has been deleted.', 'success');
+            swalWithBootstrapButtons.fire('Deleted!', 'Your comment has been deleted.', 'success');
           });
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithBootstrapButtons.fire('Cancelled', 'Your imaginary file is safe :)', 'error');
+          swalWithBootstrapButtons.fire('Cancelled', 'Your comment is safe :)', 'error');
         }
       });
     },
@@ -20734,12 +20734,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     HorizontalSlider: _Components_HorizontalSlider_vue__WEBPACK_IMPORTED_MODULE_0__.default,
     AppLayout: _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_1__.default
   },
+  props: ['author'],
   data: function data() {
     return {
       facebookIcon: __webpack_require__(/*! ../../icons/facebook.png */ "./resources/icons/facebook.png"),
       instagramIcon: __webpack_require__(/*! ../../icons/instagram.png */ "./resources/icons/instagram.png"),
       twitterIcon: __webpack_require__(/*! ../../icons/twitter.png */ "./resources/icons/twitter.png"),
-      authors: [],
+      // author: [],
       shownTags: ['asdf', 'lorem'],
       comics: {
         all: {
@@ -20767,12 +20768,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         where_tag: elem
       })), elem);
     });
-    this.getComics(route('api.comics.list', this.query), 'all');
-    axios.get(route('api.author.show', {
-      author: this.$route.params.authorId
-    })).then(function (response) {
-      _this.authors = response.data;
-    });
+    this.getComics(route('api.comics.list', this.query), 'all'); // axios.get(route('api.author.show', { author: this.$route.params.authorId }))
+    //     .then((response) => {
+    //         this.authors = response.data
+    //     })
   },
   methods: {
     processToHorizontalSlider: function processToHorizontalSlider(comicObjects) {
@@ -20852,11 +20851,12 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     Comments: _Components_Comments_vue__WEBPACK_IMPORTED_MODULE_2__.default
   },
   props: ['comic'],
-  inject: ['swal'],
+  inject: ['swal', 'helpers'],
   data: function data() {
     return {
       showArOption: false,
       favorited: false,
+      chapterFavorited: {},
       subscribed: false,
       arSelected: false,
       user: null,
@@ -20900,17 +20900,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       _this.purchaseObj = response.data;
       _this.purchased = Object.keys(_objectSpread({}, response.data)).length > 0;
       return axios.get(route('api.comic.check.bookmark', {
-        comicId: _this.comic.id
+        comic: _this.comic.id
       }));
     }).then(function (response) {
       _this.bookmark = response.data;
     });
+    console.log(JSON.parse(this.user.favorites));
     this.subscribed = _.includes(JSON.parse(this.user.subscriptions).map(function (x) {
       return +x;
     }), this.comic.id);
-    this.favorited = _.includes(JSON.parse(this.user.favorites).map(function (x) {
+    var favObj = JSON.parse(this.user.favorites);
+    this.favorited = _.includes(favObj['comics'].map(function (x) {
       return +x;
     }), this.comic.id);
+    this.chapterFavorited = favObj['chapters'];
     this.authors = this.comic.authors;
     this.emitter.on('reloadComments', this.reloadComments);
     localStorage.setItem('lastPage', JSON.stringify({
@@ -20965,7 +20968,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this3 = this;
 
       return axios.get(route('api.comic.subscribe', {
-        comicId: this.comic.id
+        comic: this.comic.id
       })).then(function (response) {
         _this3.subscribed = _.includes(response.data.map(function (x) {
           return +x;
@@ -20976,16 +20979,25 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       var _this4 = this;
 
       return axios.get(route('api.comic.favorite', {
-        comicId: this.comic.id
+        comic: this.comic.id
       })).then(function (response) {
-        _this4.favorited = _.includes(response.data.map(function (x) {
+        _this4.favorited = _.includes(response.data.comics.map(function (x) {
           return +x;
         }), _this4.comic.id);
       });
     },
+    favoriteChapter: function favoriteChapter(chapterId) {
+      var _this5 = this;
+
+      return axios.get(route('api.chapter.favorite', {
+        chapter: chapterId
+      })).then(function (response) {
+        _this5.chapterFavorited = response.data.chapters;
+      });
+    },
     checkPurchased: function checkPurchased() {
       return axios.get(route('api.comic.check.purchased', {
-        comicId: this.comic.id
+        comic: this.comic.id
       }));
     },
     closeModal: function closeModal() {
@@ -21019,26 +21031,26 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.emitter.emit('cartAddItem');
     },
     parseAuthors: function parseAuthors() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.comic.authors.forEach(function (element) {
-        _this5.authors.push({
+        _this6.authors.push({
           name: element.name,
           id: element.id
         });
       });
     },
     openModal: function openModal(chapter) {
-      var _this6 = this;
+      var _this7 = this;
 
       axios.get(route('api.chapter.check.ar', {
         chapter: chapter.id
       })).then(function (response) {
-        _this6.showArOption = response.data;
-        _this6.episodeModal = chapter;
-        _this6.modal = true;
-        _this6.arSelected = false;
-        _this6.tokenPrice = _this6.episodeModal.token_price;
+        _this7.showArOption = response.data;
+        _this7.episodeModal = chapter;
+        _this7.modal = true;
+        _this7.arSelected = false;
+        _this7.tokenPrice = _this7.episodeModal.token_price;
       });
     },
     purchaseComic: function purchaseComic() {
@@ -21076,7 +21088,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       // }})
     },
     isEmpty: function isEmpty(item) {
-      return _.isEmpty(item);
+      // return _.isEmpty(item)
+      return item === null;
     },
     gotToTag: function gotToTag() {},
     goToChapter: function goToChapter(chapter) {
@@ -21097,8 +21110,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       // }})
 
     },
+    checkArPuchased: function checkArPuchased(chapter) {
+      return this.purchaseObj.ar.map(function (x) {
+        return +x;
+      }).includes(chapter);
+    },
     purchaseChapter: function purchaseChapter() {
-      var _this7 = this;
+      var _this8 = this;
 
       axios.post(route('api.chapter.purchase'), {
         ar: this.arSelected,
@@ -21107,10 +21125,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         var status = response.data.status;
 
         if (status === 0) {
-          _this7.modal = false;
-          _this7.episodeModal = null;
+          _this8.modal = false;
+          _this8.episodeModal = null;
 
-          _this7.swal.fire({
+          _this8.swal.fire({
             icon: "error",
             title: "Not Enough Token",
             text: "You don't have enough token! Please purchase more tokens!",
@@ -21119,31 +21137,31 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
             console.log(e);
           });
         } else if (status === -1) {
-          _this7.modal = false;
-          _this7.episodeModal = null;
+          _this8.modal = false;
+          _this8.episodeModal = null;
 
-          _this7.swal.fire({
+          _this8.swal.fire({
             icon: "info",
             title: "Already purchased",
             text: "Chapter already purchased!"
           });
         } else {
           axios.get(route('api.user.check')).then(function (response) {
-            _this7.user = response.data;
+            _this8.user = response.data;
           });
 
-          _this7.checkPurchased().then(function (response) {
-            _this7.purchaseObj = response.data;
-            _this7.purchased = Object.keys(_objectSpread({}, response.data)).length > 0;
+          _this8.checkPurchased().then(function (response) {
+            _this8.purchaseObj = response.data;
+            _this8.purchased = Object.keys(_objectSpread({}, response.data)).length > 0;
 
-            _this7.swal.fire({
+            _this8.swal.fire({
               icon: "success",
               title: "Purchase successful!",
               text: "Chapter purchased!"
             });
 
-            _this7.modal = false;
-            _this7.episodeModal = null;
+            _this8.modal = false;
+            _this8.episodeModal = null;
           });
         }
       });
@@ -21224,6 +21242,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   created: function created() {
     var _this = this;
 
+    localStorage.removeItem('lastPage');
     this.shownTags = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_3__.usePage)().props.value.tags;
     this.shownTags.forEach(function (elem) {
       _this.comics[elem] = {};
@@ -21738,7 +21757,7 @@ __webpack_require__.r(__webpack_exports__);
 
     console.log(this.$page.props.error);
     this.comments = this.$page.props.comments;
-    this.isAr = this.ar === 'true';
+    this.isAr = this.ar === '1';
     this.chapters = this.comic.chapters;
     this.prevEnabled = this.chapter.id != this.chapters[0].id;
     this.nextEnabled = this.chapter.id != this.chapters[this.chapters.length - 1].id;
@@ -25974,7 +25993,7 @@ var _hoisted_12 = {
 
 var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "text-xl font-bold"
-}, "About Authors :", -1
+}, "About Author :", -1
 /* HOISTED */
 );
 
@@ -25994,40 +26013,49 @@ var _hoisted_16 = {
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_horizontal_slider = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("horizontal-slider");
 
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    "class": "w-24 h-36",
-    src: this.authors.profile_picture_url
-  }, null, 8
-  /* PROPS */
-  , _hoisted_3)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.authors.name), 1
-  /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.authors.email), 1
-  /* TEXT */
-  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    "class": "ml-3",
-    src: $data.facebookIcon["default"]
-  }, null, 8
-  /* PROPS */
-  , _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    "class": "ml-5",
-    src: $data.instagramIcon["default"]
-  }, null, 8
-  /* PROPS */
-  , _hoisted_10), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    "class": "ml-5",
-    src: $data.twitterIcon["default"]
-  }, null, 8
-  /* PROPS */
-  , _hoisted_11)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.authors.description), 1
-  /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
-    items: $options.processToHorizontalSlider($data.comics.all.comics),
-    config: $data.config,
-    objectCategory: "all",
-    onNextPage: $options.nextPage
-  }, null, 8
-  /* PROPS */
-  , ["items", "config", "onNextPage"])])])])])]);
+  var _component_app_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("app-layout");
+
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_app_layout, null, {
+    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+        "class": "w-24 h-36",
+        src: $props.author.profile_picture_url
+      }, null, 8
+      /* PROPS */
+      , _hoisted_3)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.author.name), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.author.email), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+        "class": "ml-3",
+        src: $data.facebookIcon["default"]
+      }, null, 8
+      /* PROPS */
+      , _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+        "class": "ml-5",
+        src: $data.instagramIcon["default"]
+      }, null, 8
+      /* PROPS */
+      , _hoisted_10), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+        "class": "ml-5",
+        src: $data.twitterIcon["default"]
+      }, null, 8
+      /* PROPS */
+      , _hoisted_11)])])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [_hoisted_13, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.author.description), 1
+      /* TEXT */
+      )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
+        items: $options.processToHorizontalSlider($data.comics.all.comics),
+        config: $data.config,
+        objectCategory: "all",
+        onNextPage: $options.nextPage
+      }, null, 8
+      /* PROPS */
+      , ["items", "config", "onNextPage"])])])])])];
+    }),
+    _: 1
+    /* STABLE */
+
+  });
 }
 
 /***/ }),
@@ -26055,30 +26083,37 @@ var _hoisted_3 = {
   "class": "text-sm"
 };
 var _hoisted_4 = {
-  "class": "flex flex-row content-center justify-between"
-};
-var _hoisted_5 = {
-  xmlns: "http://www.w3.org/2000/svg",
-  "class": "h-6 w-6",
-  fill: "none",
-  viewBox: "0 0 24 24",
-  stroke: "currentColor"
-};
-var _hoisted_6 = {
-  "class": "divide-y divide-black"
-};
-var _hoisted_7 = {
-  "class": "flex-none w-1/5 lg:w-24"
-};
-var _hoisted_8 = ["src"];
-var _hoisted_9 = ["onClick"];
-var _hoisted_10 = {
-  "class": "flex flex-row w-100"
+  "class": "flex mt-2"
 };
 
-var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "mr-2"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+var _hoisted_5 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  width: "18",
+  height: "18",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "#ffffff",
+  "stroke-width": "2",
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("circle", {
+  cx: "12",
+  cy: "12",
+  r: "3"
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_6 = {
+  "class": "text-sm px-2"
+};
+var _hoisted_7 = {
+  "class": "flex"
+};
+
+var _hoisted_8 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
   xmlns: "http://www.w3.org/2000/svg",
   "class": "h-4 w-4",
   fill: "none",
@@ -26089,50 +26124,124 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
   "stroke-linejoin": "round",
   "stroke-width": "2",
   d: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-})])], -1
+})], -1
 /* HOISTED */
 );
 
+var _hoisted_9 = {
+  "class": "text-sm px-2"
+};
+var _hoisted_10 = {
+  "class": "flex flex-row content-center justify-between"
+};
+var _hoisted_11 = {
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-6 w-6",
+  fill: "none",
+  viewBox: "0 0 24 24",
+  stroke: "currentColor"
+};
 var _hoisted_12 = {
-  "class": "text-xs"
+  "class": "divide-y divide-black"
 };
 var _hoisted_13 = {
-  "class": "w-2/5 flex justify-center items-center"
+  "class": "flex-none w-1/5 lg:w-24"
 };
-var _hoisted_14 = ["onClick"];
-var _hoisted_15 = ["onClick"];
+var _hoisted_14 = ["src"];
+var _hoisted_15 = {
+  "class": "flex-grow flex flex-col p-3 w-2/5 lg:w-2"
+};
 var _hoisted_16 = {
-  "class": "p-5 text-white"
+  "class": "flex flex-row w-100"
 };
 var _hoisted_17 = {
+  "class": "text-xs py-1 ml-2"
+};
+var _hoisted_18 = {
+  "class": "flex flex-row mt-2"
+};
+var _hoisted_19 = {
+  "class": "flex flex-row"
+};
+var _hoisted_20 = ["onClick"];
+
+var _hoisted_21 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round",
+  "stroke-width": "2",
+  d: "M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+}, null, -1
+/* HOISTED */
+);
+
+var _hoisted_22 = [_hoisted_21];
+var _hoisted_23 = {
+  "class": "text-xs px-0.5"
+};
+var _hoisted_24 = {
+  "class": "flex flex-row ml-2"
+};
+
+var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
+  xmlns: "http://www.w3.org/2000/svg",
+  "class": "h-4 w-4",
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "#ffffff",
+  "stroke-width": "2",
+  "stroke-linecap": "round",
+  "stroke-linejoin": "round"
+}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+  d: "M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+}), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("circle", {
+  cx: "12",
+  cy: "12",
+  r: "3"
+})], -1
+/* HOISTED */
+);
+
+var _hoisted_26 = {
+  "class": "text-xs px-0.5"
+};
+var _hoisted_27 = {
+  "class": "w-2/5 flex justify-center items-center"
+};
+var _hoisted_28 = ["onClick"];
+var _hoisted_29 = ["onClick"];
+var _hoisted_30 = ["onClick"];
+var _hoisted_31 = {
+  "class": "text-white"
+};
+var _hoisted_32 = {
   "class": "p-6 flex flex-col content-center justify-center"
 };
-var _hoisted_18 = ["src"];
-var _hoisted_19 = {
+var _hoisted_33 = ["src"];
+var _hoisted_34 = {
   "class": "lg:p-2"
 };
-var _hoisted_20 = {
+var _hoisted_35 = {
   "class": "lg:p-2"
 };
-var _hoisted_21 = {
+var _hoisted_36 = {
   "class": "lg:p-2"
 };
-var _hoisted_22 = {
+var _hoisted_37 = {
   key: 0,
   "class": "lg:p-2"
 };
 
-var _hoisted_23 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_38 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "ml-2"
 }, "Beli AR", -1
 /* HOISTED */
 );
 
-var _hoisted_24 = {
+var _hoisted_39 = {
   "class": "flex h-16 bg-purple-600 bg-opacity-25"
 };
 
-var _hoisted_25 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Purchase more tokens!");
+var _hoisted_40 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Purchase more tokens!");
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Link");
@@ -26208,7 +26317,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* KEYED_FRAGMENT */
       ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.comic.description), 1
       /* TEXT */
-      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button class=\"text-sm mt-3 inline-flex items-center justify-center px-2 py-1 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white\" @click=\"continueReading(true)\">Subscribe</button> "), $data.purchased ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [_hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.helpers.compactFormatter($data.comic.views)), 1
+      /* TEXT */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [_hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.helpers.compactFormatter($data.comic.favorites_count)), 1
+      /* TEXT */
+      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button class=\"text-sm mt-3 inline-flex items-center justify-center px-2 py-1 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white\" @click=\"continueReading(true)\">Subscribe</button> "), $data.purchased ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 0
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         "class": "text-sm mt-3 inline-flex items-center justify-center px-2 py-2 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white",
@@ -26234,7 +26347,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onClick: _cache[4] || (_cache[4] = function () {
           return $options.favoriteComic && $options.favoriteComic.apply($options, arguments);
         })
-      }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("svg", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+      }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("svg", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
         "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["animated", $data.favorited ? 'fill-white' : 'fill-none']),
         "stroke-linecap": "round",
         "stroke-linejoin": "round",
@@ -26244,28 +26357,39 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* CLASS */
       )]))])])], 4
       /* STYLE */
-      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.chapters, function (chapter, idx) {
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.chapters, function (chapter, idx) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           "class": "flex flex-row h-20 bg-indigo-800 text-white",
           key: 'chapter-' + idx
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
           "class": "h-full w-full",
           src: chapter.image_url,
           alt: ""
         }, null, 8
         /* PROPS */
-        , _hoisted_8)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-          "class": "flex-grow flex flex-col p-3 w-2/5 lg:w-2",
+        , _hoisted_14)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <div class=\"flex-grow flex flex-col p-3 w-2/5 lg:w-2\" @click=\"goToChapter(chapter.id)\"> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Ep. " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(chapter.chapter), 1
+        /* TEXT */
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(chapter.release_date), 1
+        /* TEXT */
+        )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
           onClick: function onClick($event) {
-            return $options.goToChapter(chapter.id);
+            return $options.favoriteChapter(chapter.id);
           }
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Ep. " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(chapter.chapter), 1
-        /* TEXT */
-        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [_hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(chapter.release_date), 1
-        /* TEXT */
-        )])], 8
+        }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("svg", {
+          "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$data.chapterFavorited.includes(chapter.id) ? 'fill-white' : 'fill-none', "h-4 w-4"]),
+          xmlns: "http://www.w3.org/2000/svg",
+          fill: "none",
+          viewBox: "0 0 24 24",
+          stroke: "currentColor"
+        }, _hoisted_22, 2
+        /* CLASS */
+        ))], 8
         /* PROPS */
-        , _hoisted_9), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [$options.checkChapter($data.purchaseObj.chapters, chapter.id) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+        , _hoisted_20), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_23, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.helpers.compactFormatter(chapter.favorites_count)), 1
+        /* TEXT */
+        )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [_hoisted_25, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_26, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($options.helpers.compactFormatter(chapter.views)), 1
+        /* TEXT */
+        )])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_27, [$options.checkChapter($data.purchaseObj.chapters, chapter.id) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
           key: 0,
           "class": "text-xs items-center min-h-8 w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white",
           onClick: function onClick($event) {
@@ -26273,18 +26397,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }
         }, "Buy Ep. " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(chapter.chapter), 9
         /* TEXT, PROPS */
-        , _hoisted_14)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
-          key: 1,
+        , _hoisted_28)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+          key: 1
+        }, [$options.checkArPuchased(chapter.id) ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+          key: 0,
           "class": "text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white",
           onClick: function onClick($event) {
             return $options.goToChapter(chapter.id, true);
           }
         }, "Read Ep. " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(chapter.chapter) + " With AR", 9
         /* TEXT, PROPS */
-        , _hoisted_15)), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button @click=\"openModal(preview.chapter)\">Buy Episode</button> ")])]);
+        , _hoisted_29)) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
+          key: 1,
+          "class": "text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white",
+          onClick: function onClick($event) {
+            return $options.goToChapter(chapter.id, false);
+          }
+        }, "Read Ep. " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(chapter.chapter), 9
+        /* TEXT, PROPS */
+        , _hoisted_30))], 2112
+        /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */
+        )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button @click=\"openModal(preview.chapter)\">Buy Episode</button> ")])]);
       }), 128
       /* KEYED_FRAGMENT */
-      ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_add_new_comment, {
+      ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_31, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_add_new_comment, {
         commentKey: _ctx.$page.props.comment_key
       }, null, 8
       /* PROPS */
@@ -26300,18 +26436,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         })
       }, {
         body: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
             src: $data.episodeModal.image_url,
             "class": "h-1/2 rounded-lg lg:h-96 lg:w-full"
           }, null, 8
           /* PROPS */
-          , _hoisted_18), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, "Harga: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.tokenPrice) + " Token", 1
+          , _hoisted_33), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, "Harga: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.tokenPrice) + " Token", 1
           /* TEXT */
-          ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_20, "Token kamu: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.user.total_tokens), 1
+          ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_35, "Token kamu: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.user.total_tokens), 1
           /* TEXT */
-          ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_21, "Apakah kamu mau membeli Ep. " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.episodeModal.chapter) + "?", 1
+          ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_36, "Apakah kamu mau membeli Ep. " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($data.episodeModal.chapter) + "?", 1
           /* TEXT */
-          ), $data.showArOption ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_22, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+          ), $data.showArOption ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_37, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
             onChange: _cache[5] || (_cache[5] = function () {
               return $options.adjustPrice && $options.adjustPrice.apply($options, arguments);
             }),
@@ -26322,10 +26458,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
             })
           }, null, 544
           /* HYDRATE_EVENTS, NEED_PATCH */
-          ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.arSelected]]), _hoisted_23])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
+          ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $data.arSelected]]), _hoisted_38])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])];
         }),
         footer: (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_24, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_39, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
             onClick: _cache[7] || (_cache[7] = function () {
               return $options.closeModal && $options.closeModal.apply($options, arguments);
             }),
@@ -26347,7 +26483,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         href: _ctx.route('web.mytokens')
       }, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [_hoisted_25];
+          return [_hoisted_40];
         }),
         _: 1
         /* STABLE */
@@ -27094,12 +27230,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           key: 'img-' + idx,
           id: 'ar-' + page.id
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
-          href: {
-            name: 'sceneShow',
-            params: {
-              pageId: page.id
-            }
-          }
+          href: _ctx.route('web.scene', {
+            page: page.id
+          })
         }, {
           "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
             return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
@@ -28922,6 +29055,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue3_mq__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue3-mq */ "./node_modules/vue3-mq/dist/vue3-mq.es.js");
 /* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
 /* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./helpers */ "./resources/js/helpers.js");
 var _window$document$getE;
 
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
@@ -28929,6 +29063,7 @@ __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
 
 
  // import store from './Store/store'
+
 
 
 
@@ -28956,7 +29091,8 @@ var p = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.createInertiaApp
     });
     window.l.config.globalProperties.emitter = emitter;
     window.l.config.globalProperties.$Swal = (sweetalert2__WEBPACK_IMPORTED_MODULE_5___default());
-    window.l.provide('swal', (sweetalert2__WEBPACK_IMPORTED_MODULE_5___default())); // window.l.use(store)
+    window.l.provide('swal', (sweetalert2__WEBPACK_IMPORTED_MODULE_5___default()));
+    window.l.provide('helpers', _helpers__WEBPACK_IMPORTED_MODULE_6__.default); // window.l.use(store)
 
     window.l.use(vue3_mq__WEBPACK_IMPORTED_MODULE_4__.Vue3Mq, {
       preset: "tailwind"
@@ -29005,6 +29141,29 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'; // 
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/***/ }),
+
+/***/ "./resources/js/helpers.js":
+/*!*********************************!*\
+  !*** ./resources/js/helpers.js ***!
+  \*********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  compactFormatter: function compactFormatter(number) {
+    var locale = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'id';
+    var formatter = Intl.NumberFormat(locale, {
+      notation: 'compact'
+    });
+    return formatter.format(number);
+  }
+});
 
 /***/ }),
 

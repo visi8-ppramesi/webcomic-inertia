@@ -35,7 +35,7 @@ class UserFactory extends Factory
             'read_history' => '[]',
             'total_tokens' => 100,
             'subscriptions' => '[]',
-            'favorites' => '[]',
+            'favorites' => json_encode(['comics' => [], 'chapters' => []]),
             'bookmark' => '{}'
         ];
     }

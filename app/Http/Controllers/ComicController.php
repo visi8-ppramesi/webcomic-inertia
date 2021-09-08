@@ -14,13 +14,13 @@ class ComicController extends Controller
         return response()->json($comments, 200);
     }
 
-    public function getComicChapters($comicId){
-        $chapters = Page::where('comic_id', $comicId)->get()->pluck('chapter')->toArray();
+    public function getComicChapters($comic){
+        $chapters = Page::where('comic_id', $comic)->get()->pluck('chapter')->toArray();
         return response()->json(array_values(array_unique($chapters)), 200);
     }
 
-    public function getComicChapterCount($comicId){
-        return response()->json(Page::where('comic_id', $comicId)->max('chapter'), 200);
+    public function getComicChapterCount($comic){
+        return response()->json(Page::where('comic_id', $comic)->max('chapter'), 200);
     }
 
     public function purchaseComics(Request $request){
@@ -50,14 +50,14 @@ class ComicController extends Controller
         return response()->json(['ids' => $ids], 200);
     }
 
-    public function checkPurchased($comicId){
+    public function checkPurchased(Comic $comic){
         $u = auth()->user();
-        return response()->json($u->checkComicPurchased($comicId), 200);
+        return response()->json($u->checkComicPurchased($comic->id), 200);
     }
 
-    public function checkBookmarked($comicId){
+    public function checkBookmarked(Comic $comic){
         $u = auth()->user();
-        return response()->json($u->getComicBookmarkedPage($comicId), 200);
+        return response()->json($u->getComicBookmarkedPage($comic->id), 200);
     }
 
     public function getFavorites(){
@@ -65,14 +65,20 @@ class ComicController extends Controller
         return response()->json(Comic::pipe($u->favorites()), 200);
     }
 
-    public function toggleFavoriteComic($comicId){
+    public function toggleFavoriteComic(Comic $comic){
         $u = auth()->user();
-        return response()->json($u->toggleFavoriteComic($comicId));
+        $fav = $u->toggleFavorite($comic->id, 'comics');
+        if($fav['type'] == 'increment'){
+            $comic->increment('favorites_count');
+        }else if($fav['type'] == 'decrement'){
+            $comic->decrement('favorites_count');
+        }
+        return response()->json($fav['favorite_obj']);
     }
 
-    public function toggleSubscribeComic($comicId){
+    public function toggleSubscribeComic($comic){
         $u = auth()->user();
-        return response()->json($u->toggleSubscribeComic($comicId));
+        return response()->json($u->toggleSubscribeComic($comic));
     }
 
     /**

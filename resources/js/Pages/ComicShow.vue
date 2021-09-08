@@ -19,6 +19,16 @@
                     </template>
                 </div>
                 <div class="text-sm">{{comic.description}}</div>
+                <div class="flex mt-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    <div class="text-sm px-2">{{helpers.compactFormatter(comic.views)}}</div>
+                    <div class="flex">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        <div class="text-sm px-2">{{helpers.compactFormatter(comic.favorites_count)}}</div>
+                    </div>
+                </div>
                 <div class="flex flex-row content-center justify-between">
                     <!-- <button class="text-sm mt-3 inline-flex items-center justify-center px-2 py-1 rounded-full text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="continueReading(true)">Subscribe</button> -->
                     <template v-if="purchased">
@@ -41,27 +51,38 @@
                     <div class="flex-none w-1/5 lg:w-24">
                         <img class="h-full w-full" :src="chapter.image_url" alt="">
                     </div>
-                    <div class="flex-grow flex flex-col p-3 w-2/5 lg:w-2" @click="goToChapter(chapter.id)">
-                        <div>Ep. {{chapter.chapter}}</div>
+                    <!-- <div class="flex-grow flex flex-col p-3 w-2/5 lg:w-2" @click="goToChapter(chapter.id)"> -->
+                    <div class="flex-grow flex flex-col p-3 w-2/5 lg:w-2">
                         <div class="flex flex-row w-100">
-                            <div class="mr-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
+                            <div>Ep. {{chapter.chapter}}</div>
+                            <div class="text-xs py-1 ml-2">{{chapter.release_date}}</div>
+                        </div>
+                        <div class="flex flex-row mt-2">
+                            <div class="flex flex-row">
+                                <button @click="favoriteChapter(chapter.id)">
+                                    <svg :class="chapterFavorited.includes(chapter.id) ? 'fill-white' : 'fill-none'" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                    </svg>
+                                </button>
+                                <div class="text-xs px-0.5">{{helpers.compactFormatter(chapter.favorites_count)}}</div>
                             </div>
-                            <div class="text-xs">{{chapter.release_date}}</div>
+                            <div class="flex flex-row ml-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                <div class="text-xs px-0.5">{{helpers.compactFormatter(chapter.views)}}</div>
+                            </div>
                         </div>
                     </div>
                     <div class="w-2/5 flex justify-center items-center" >
                         <button v-if="checkChapter(purchaseObj.chapters, chapter.id)" class="text-xs items-center min-h-8 w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="openModal(chapter)">Buy Ep. {{chapter.chapter}}</button>
                         <template v-else>
-                            <button class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter.id, true)">Read Ep. {{chapter.chapter}} With AR</button>
+                            <button v-if="checkArPuchased(chapter.id)" class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter.id, true)">Read Ep. {{chapter.chapter}} With AR</button>
+                            <button v-else class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter.id, false)">Read Ep. {{chapter.chapter}}</button>
                         </template>
                         <!-- <button @click="openModal(preview.chapter)">Buy Episode</button> -->
                     </div>
                 </div>
             </div>
-            <div class="p-5 text-white">
+            <div class="text-white">
                 <add-new-comment
                     :commentKey="$page.props.comment_key"
                 />
@@ -124,11 +145,12 @@ export default {
         Comments
     },
     props: ['comic'],
-    inject: ['swal'],
+    inject: ['swal', 'helpers'],
     data(){
         return {
             showArOption: false,
             favorited: false,
+            chapterFavorited: {},
             subscribed: false,
             arSelected: false,
             user: null,
@@ -170,13 +192,16 @@ export default {
         .then((response) => {
             this.purchaseObj = response.data
             this.purchased = Object.keys({...response.data}).length > 0
-            return axios.get(route('api.comic.check.bookmark', {comicId: this.comic.id}))
+            return axios.get(route('api.comic.check.bookmark', {comic: this.comic.id}))
         })
         .then((response) => {
             this.bookmark = response.data
         })
+        console.log(JSON.parse(this.user.favorites))
         this.subscribed = _.includes(JSON.parse(this.user.subscriptions).map(x => +x), this.comic.id)
-        this.favorited = _.includes(JSON.parse(this.user.favorites).map(x => +x), this.comic.id)
+        let favObj = JSON.parse(this.user.favorites)
+        this.favorited = _.includes(favObj['comics'].map(x => +x), this.comic.id)
+        this.chapterFavorited = favObj['chapters']
         this.authors = this.comic.authors
         this.emitter.on('reloadComments', this.reloadComments)
 
@@ -223,19 +248,25 @@ export default {
             })
         },
         subscribeComic(){
-            return axios.get(route('api.comic.subscribe', {comicId: this.comic.id}))
+            return axios.get(route('api.comic.subscribe', {comic: this.comic.id}))
             .then((response) => {
                 this.subscribed = _.includes(response.data.map(x => +x), this.comic.id)
             })
         },
         favoriteComic(){
-            return axios.get(route('api.comic.favorite', {comicId: this.comic.id}))
+            return axios.get(route('api.comic.favorite', {comic: this.comic.id}))
             .then((response) => {
-                this.favorited = _.includes(response.data.map(x => +x), this.comic.id)
+                this.favorited = _.includes(response.data.comics.map(x => +x), this.comic.id)
+            })
+        },
+        favoriteChapter(chapterId){
+            return axios.get(route('api.chapter.favorite', {chapter: chapterId}))
+            .then((response) => {
+                this.chapterFavorited = response.data.chapters
             })
         },
         checkPurchased(){
-            return axios.get(route('api.comic.check.purchased', {comicId: this.comic.id}))
+            return axios.get(route('api.comic.check.purchased', {comic: this.comic.id}))
         },
         closeModal(){
             this.modal = false
@@ -311,7 +342,8 @@ export default {
             // }})
         },
         isEmpty(item){
-            return _.isEmpty(item)
+            // return _.isEmpty(item)
+            return item === null
         },
         gotToTag(){
 
@@ -327,6 +359,9 @@ export default {
             // query:{
             //     ar: ar
             // }})
+        },
+        checkArPuchased(chapter){
+            return this.purchaseObj.ar.map(x => +x).includes(chapter)
         },
         purchaseChapter(){
             axios.post(route('api.chapter.purchase'), {
