@@ -2,13 +2,32 @@
 
 namespace App\Models;
 
+use App\Filters\Get;
+use App\Filters\TransactionsWhereChapter;
+use App\Filters\TransactionsWhereType;
+use App\Filters\WhereCreatedAfter;
+use App\Filters\WhereCreatedBefore;
+use App\Filters\WhereUserId;
+use App\Traits\Pipeable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class TokenTransaction extends Model
 {
     use HasFactory;
+    use Pipeable;
     protected $guarded = [];
+
+    public function pipeable(){
+        return [
+            Get::class,
+            WhereUserId::class,
+            WhereCreatedAfter::class,
+            WhereCreatedBefore::class,
+            TransactionsWhereType::class,
+            TransactionsWhereChapter::class,
+        ];
+    }
 
     public function transactionable(){
         return $this->morphTo();

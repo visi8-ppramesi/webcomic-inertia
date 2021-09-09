@@ -21,4 +21,8 @@ abstract class Filter{
     protected function filterName(){
         return Str::snake(class_basename($this));
     }
+
+    protected function getRequestFilterValue(){
+        return request($this->filterName());
+    }
 }

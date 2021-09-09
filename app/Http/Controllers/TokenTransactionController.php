@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\TransactionsWhereChapter;
+use App\Filters\WhereUserId;
+use App\Models\Chapter;
 use App\Models\Setting;
 use App\Models\TokenTransaction;
+use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -30,14 +36,37 @@ class TokenTransactionController extends Controller
         return response()->json($u->purchaseToken($validated['token_amount'], $validated['money_amount'], 'testing'), 200);
     }
 
+    public function getUserTransactions(User $user){
+        if(Gate::allows('view-transactions')){
+            return response()->json(TokenTransaction::pipe(null, [
+                WhereUserId::class => $user->id
+            ]), 200);
+        }
+
+        abort(403, 'Unauthorized action.');
+    }
+
+    public function getChapterTransactions(Chapter $chapter){
+        if(Gate::allows('view-chapter-transactions')){
+            return response()->json(TokenTransaction::pipe(null, [
+                TransactionsWhereChapter::class => $chapter->id
+            ]), 200);
+        }
+
+        abort(403, 'Unauthorized action.');
+    }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        //
+    public function index(){
+        if(Gate::allows('view-transactions')){
+            return response()->json(TokenTransaction::pipe(), 200);
+        }
+
+        abort(403, 'Unauthorized action.');
     }
 
     /**

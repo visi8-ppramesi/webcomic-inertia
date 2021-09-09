@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Helpers\Acl;
+use App\Models\TokenTransaction;
+use App\Models\User;
 use App\Policies\CommentPolicy;
+use App\Policies\TokenTransactionPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -15,6 +19,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        // TokenTransaction::class => TokenTransactionPolicy::class
     ];
 
     /**
@@ -25,6 +30,18 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
+
+        Gate::define('view-chapter-transactions', function (User $user){
+            return $user->hasPermissionTo(Acl::PERMISSION_TRANSACTION_MANAGE);
+        });
+
+        Gate::define('view-transactions', function (User $user){
+            $u = auth()->user();
+            if(empty($u)){
+                return false;
+            }
+            return $u->hasPermissionTo(Acl::PERMISSION_TRANSACTION_MANAGE) || $u->id == $user->id;
+        });
 
         Gate::resource('comments_custom', CommentPolicy::class, [
             'delete' => 'delete',

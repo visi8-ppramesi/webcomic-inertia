@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\TransactionsWhereType;
+use App\Filters\WhereUserId;
 use App\Helpers\Query;
 use App\Models\Author;
 use App\Models\Chapter;
@@ -9,13 +11,36 @@ use App\Models\Comic;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Models\Comment;
+use App\Models\TokenTransaction;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use tizis\laraComments\UseCases\CommentService;
+use Illuminate\Support\Facades\Gate;
 
 class ViewController extends Controller
 {
+    public function viewMyTransactionsShow(){
+        if(Gate::allows('view-transactions')){
+            $u = auth()->user();
+            $purchaseTransactions = TokenTransaction::pipe(null, [
+                WhereUserId::class => $u->id,
+                TransactionsWhereType::class => 'purchase_token'
+            ]);
+            $chapterTransactions = TokenTransaction::pipe(null, [
+                WhereUserId::class => $u->id,
+                TransactionsWhereType::class => 'purchase_comic'
+            ]);
+
+            return Inertia::render('MyTransactionsShow', [
+                'purchase_tokens' => $purchaseTransactions,
+                'purchase_chapters' => $chapterTransactions
+            ]);
+        }
+
+        abort(403, 'Unauthorized action.');
+    }
+
     public function viewMyTokensShow(){
         $tokenPrices = Setting::getValue('token.prices');
         return Inertia::render('MyTokensShow', [

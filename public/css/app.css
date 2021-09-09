@@ -1147,6 +1147,9 @@ select {
 .col-span-3 {
 	grid-column: span 3 / span 3;
 }
+.col-span-1 {
+	grid-column: span 1 / span 1;
+}
 .float-right {
 	float: right;
 }
@@ -1567,6 +1570,9 @@ select {
 }
 .grid-cols-5 {
 	grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+.grid-cols-7 {
+	grid-template-columns: repeat(7, minmax(0, 1fr));
 }
 .flex-row {
 	flex-direction: row;
@@ -2066,6 +2072,9 @@ select {
 }
 .pr-3 {
 	padding-right: 0.75rem;
+}
+.pb-10 {
+	padding-bottom: 2.5rem;
 }
 .text-left {
 	text-align: left;
