@@ -3,7 +3,7 @@
         <div>
             <div class="">
                 <div class="bg-gray-300 w-full h-10 border-t-2 border-b-2 border-black">
-                    <div class="text-center text-lg pt-1">Favorite Comic</div>
+                    <div class="text-center text-lg pt-1">Favorited Comics</div>
                 </div>
             </div>
             <div class="px-5 pt-5">
@@ -33,7 +33,7 @@
         <div>
             <div class="pt-5">
                 <div class="bg-gray-300 w-full h-10 border-t-2 border-b-2 border-black">
-                    <div class="text-center text-lg pt-1">Subscribed Comic</div>
+                    <div class="text-center text-lg pt-1">Subscribed Comics</div>
                 </div>
             </div>
             <div class="px-5 py-5">

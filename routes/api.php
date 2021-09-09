@@ -7,6 +7,7 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TokenTransactionController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\VoteController;
 use App\Models\Chapter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -71,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::post('/tokens/purchase', [TokenTransactionController::class, 'purchaseTokens'])->name('api.tokens.purchase');
 
     Route::delete('/comment/{comment}', [CommentController::class, 'destroy'])->name('api.comment.delete');
+    Route::post('/comment/{comment}/vote', [VoteController::class, 'vote'])->name('api.comment.vote');
 });
 
 Route::middleware('role:visitor')->group(function(){

@@ -41,7 +41,7 @@ class ViewController extends Controller
         $comic->increment('views');
         $comic->load(['chapters', 'authors']);
 
-        $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();;
+        $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();;
 
         return Inertia::render('ComicShow', [
             'user' => $u,
@@ -63,7 +63,7 @@ class ViewController extends Controller
         $comic->load('chapters');
         if($u->checkChapterPurchased($chapter->id)){
             $chapter->increment('views');
-            $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();;
+            $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();;
 
             $param = [
                 'comic' => $comic,
@@ -80,7 +80,7 @@ class ViewController extends Controller
             $comic = $chapter->comic;
             $comic->load(['chapters', 'authors']);
 
-            $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();;
+            $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();;
 
             return Inertia::render('ComicShow', [
                 'user' => $u,
@@ -132,8 +132,8 @@ class ViewController extends Controller
 
     public function viewMyComicShow(){
         $u = auth()->user();
-        $subs = array_values(json_decode($u->subscriptions));
-        $favs = json_decode($u->favorites);
+        $subs = array_values(json_decode($u->subscriptions, true));
+        $favs = json_decode($u->favorites, true);
         $purchased = array_keys(json_decode($u->purchase_history, true));
         $comicSubs = Comic::whereIn('id', $subs)->get();
         $comicFaves = Comic::whereIn('id', array_values($favs['comics']))->get();

@@ -15,4 +15,14 @@ class CommentPolicy extends CommentPolicyPackage
        // ever true
        return $user->id === $comment->commenter_id || $user->can('manage comment');
    }
+
+   /**
+    * @param $user
+    * @param Comment $comment
+    * @return bool
+    */
+   public function vote($user, Comment $comment): bool
+   {
+       return true;
+   }
 }

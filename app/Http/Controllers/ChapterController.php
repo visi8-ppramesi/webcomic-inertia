@@ -19,7 +19,7 @@ class ChapterController extends Controller
     }
 
     public function fetchComments(Chapter $chapter){
-        $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();
+        $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();
 
         return response()->json($comments, 200);
     }

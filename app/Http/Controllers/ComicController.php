@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 class ComicController extends Controller
 {
     public function fetchComments(Comic $comic){
-        $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete();
+        $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();
 
         return response()->json($comments, 200);
     }
