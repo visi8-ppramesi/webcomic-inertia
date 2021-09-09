@@ -68,11 +68,11 @@ class ComicController extends Controller
     public function toggleFavoriteComic(Comic $comic){
         $u = auth()->user();
         $fav = $u->toggleFavorite($comic->id, 'comics');
-        if($fav['type'] == 'increment'){
-            $comic->increment('favorites_count');
-        }else if($fav['type'] == 'decrement'){
-            $comic->decrement('favorites_count');
-        }
+        // if($fav['type'] == 'increment'){
+        //     $comic->increment('favorites_count');
+        // }else if($fav['type'] == 'decrement'){
+        //     $comic->decrement('favorites_count');
+        // }
         return response()->json($fav['favorite_obj']);
     }
 

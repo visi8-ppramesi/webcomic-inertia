@@ -125,6 +125,8 @@ class User extends Authenticatable //implements MustVerifyEmail
         ];
 
         $transaction = TokenTransaction::create([
+            'transactionable_type' => Chapter::class,
+            'transactionable_id' => $chapter,
             'user_id' => $this->id,
             'token_amount' => $tokenAmount,
             'descriptor' => json_encode($descriptor)
@@ -164,10 +166,10 @@ class User extends Authenticatable //implements MustVerifyEmail
         }
         $uid = $this->id;
         $currentPurchaseObj[$comicId] = $purchaseObject;
-        return self::where('id', $uid)->update([
-            'purchase_history' => json_encode($currentPurchaseObj),
-            'total_tokens' => $currentToken
-        ]);
+        $this->purchase_history = json_encode($currentPurchaseObj);
+        $this->total_tokens = $currentToken;
+        $saved = $this->save();
+        return $saved;
     }
 
     public function subscribeComic($comicId){
@@ -203,17 +205,22 @@ class User extends Authenticatable //implements MustVerifyEmail
             so initialized to {comic:[], chapter: []}
         */
         $currentFave = json_decode($this->favorites, true);
-        $returnType = '';
+        $changeType = '';
         if(!in_array($objectId, $currentFave[$type])){
             $currentFave[$type][] = $objectId;
-            $returnType = 'increment';
+            $changeType = 'increment';
         }else{
             $currentFave[$type] = array_values(array_diff($currentFave[$type], [$objectId]));
-            $returnType = 'decrement';
+            $changeType = 'decrement';
+        }
+        if($type == 'comics'){
+            Comic::find($objectId)->{$changeType}('favorites_count');
+        }else if($type == 'chapters'){
+            Chapter::find($objectId)->{$changeType}('favorites_count');
         }
         $uid = $this->id;
         self::where('id', $uid)->update(['favorites' => json_encode($currentFave)]);
-        return ['favorite_obj' => $currentFave, 'type' => $returnType];
+        return ['favorite_obj' => $currentFave, 'type' => $changeType];
     }
 
     public function toggleSubscribeComic($objectId){

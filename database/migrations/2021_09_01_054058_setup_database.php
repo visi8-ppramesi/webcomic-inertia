@@ -44,6 +44,7 @@ class SetupDatabase extends Migration
             ['price' => 10000, 'amount' => 150],
             ['price' => 12000, 'amount' => 200],
             ['price' => 15000, 'amount' => 250, 'special_tag' => 'best_offer'],
+            ['price' => 30000, 'amount' => 1000, 'special_tag' => 'best_offer'],
         ]);
     }
 

@@ -39,6 +39,7 @@ class ComicFactory extends Factory
             // 'author_id' => $author->id,
             // 'price' => $this->faker->randomFloat(2, 0, 10),
             'cover_url' => '/storage/media/covers/' . rand(1,4) . '.jpg',
+            'views' => rand(0, 10000000)
         ];
     }
 }

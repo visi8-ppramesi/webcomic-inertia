@@ -68,6 +68,32 @@
                         </div>
                     </mq-responsive>
                 </div>
+                <div class="mb-3 text-white">
+                    <div>
+                        <div class="text-white float-right">More</div>
+                        <div>Popular</div>
+                    </div>
+                    <mq-responsive target="sm-" tag="span">
+                        <div>
+                            <horizontal-slider
+                                :items="processToHorizontalSlider(comics.popular)"
+                                :config="config"
+                                objectCategory="popular"
+                                @nextPage="nextPage"
+                            ></horizontal-slider>
+                        </div>
+                    </mq-responsive>
+                    <mq-responsive target="md+" tag="span">
+                        <div>
+                            <grid
+                                :items="processToHorizontalSlider(comics.popular)"
+                                :config="config"
+                                objectCategory="popular"
+                                @nextPage="nextPage"
+                            ></grid>
+                        </div>
+                    </mq-responsive>
+                </div>
             </div>
             <div class="px-5 py-5 bg-gray-100">
                 <div class="mb-3">
@@ -124,6 +150,7 @@ export default {
             this.comics[elem].comics = []
             this.getComics(route('api.comics.list', {...this.query, where_tag: elem}), elem)
         })
+        this.getComics(route('api.comics.list', {...this.query, sort_by_popular: 1}), 'popular')
         this.getComics(route('api.comics.list', this.query), 'all')
         this.getAuthors(route('api.authors.list', this.query), 'all')
     },
@@ -140,6 +167,9 @@ export default {
             },
             comics: {
                 all: {
+                    comics: []
+                },
+                popular: {
                     comics: []
                 }
             },

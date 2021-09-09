@@ -34,7 +34,7 @@
                     </h4>
                 </div>
                 <div></div>
-                <h4 class="uppercase tracking-wide font-bold text-xs text-blue-600" @click="toggleReplyBox">Reply</h4>
+                <h4 class="uppercase tracking-wide font-bold text-xs text-blue-600 flex items-center" @click="toggleReplyBox">Reply</h4>
             </div>
 
             <form @submit.prevent="submit" v-if="replyBox">

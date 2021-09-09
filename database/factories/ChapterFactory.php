@@ -35,6 +35,7 @@ class ChapterFactory extends Factory
             'chapter' => rand(1,10),
             'token_price' => rand(0,100),
             'release_date' => now(),
+            'views' => rand(0, 10000000)
         ];
     }
 }

@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Filters\Get;
+use App\Filters\SortByPopular;
+use App\Filters\WhereGenre;
+use App\Filters\WhereTag;
 use App\Traits\Pipeable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,6 +22,9 @@ class Comic extends Model implements ICommentable
     public function pipeable(){
         return [
             Get::class,
+            WhereTag::class,
+            WhereGenre::class,
+            SortByPopular::class,
         ];
     }
 
