@@ -19303,7 +19303,7 @@ __webpack_require__.r(__webpack_exports__);
       }), {
         vote: vote
       }).then(function (response) {
-        _this2.likes[_this2.comment.id] = !liked;
+        _this2.likes[commentId] = !liked;
 
         if (_this2.comment.id === commentId) {
           _this2.comment.rating = response.data.rating;

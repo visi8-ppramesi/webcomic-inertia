@@ -117,7 +117,7 @@ export default {
                 vote: vote
             })
             .then((response) => {
-                this.likes[this.comment.id] = !liked
+                this.likes[commentId] = !liked
                 if(this.comment.id === commentId){
                     this.comment.rating = response.data.rating
                 }else{
