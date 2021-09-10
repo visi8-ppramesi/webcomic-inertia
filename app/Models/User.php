@@ -91,7 +91,11 @@ class User extends Authenticatable //implements MustVerifyEmail
     }
 
     public function checkChapterPurchased($chapterId){
-        $comic = Chapter::find($chapterId)->comic->id;
+        $chapter = Chapter::find($chapterId);
+        if($chapter->token_price == 0){
+            return true;
+        }
+        $comic = $chapter->comic->id;
         $purchaseHistory = json_decode($this->purchase_history, true);
         return !empty($purchaseHistory[$comic]) && in_array($chapterId, $purchaseHistory[$comic]['chapters']);
     }
@@ -186,7 +190,7 @@ class User extends Authenticatable //implements MustVerifyEmail
     public function bookmarkChapter($chapterId){
         $comicId = Chapter::findOrFail($chapterId)->comic_id;
         $currentBookmark = json_decode($this->bookmark, true);
-        if($currentBookmark[$comicId] > $chapterId){
+        if(empty($currentBookmark[$comicId]) || $currentBookmark[$comicId] > $chapterId){
             $currentBookmark[$comicId] = $chapterId;
             $uid = $this->id;
             return self::where('id', $uid)->update(['bookmark' => $currentBookmark]);

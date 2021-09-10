@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Filters\TransactionsWhereType;
 use App\Filters\WhereUserId;
+use App\Filters\With;
 use App\Helpers\Query;
 use App\Models\Author;
 use App\Models\Chapter;
@@ -17,28 +18,26 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use tizis\laraComments\UseCases\CommentService;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Redirect;
 
 class ViewController extends Controller
 {
     public function viewMyTransactionsShow(){
-        if(Gate::allows('view-transactions')){
-            $u = auth()->user();
-            $purchaseTransactions = TokenTransaction::pipe(null, [
-                WhereUserId::class => $u->id,
-                TransactionsWhereType::class => 'purchase_token'
-            ]);
-            $chapterTransactions = TokenTransaction::pipe(null, [
-                WhereUserId::class => $u->id,
-                TransactionsWhereType::class => 'purchase_comic'
-            ]);
+        $u = auth()->user();
+        $purchaseTransactions = TokenTransaction::pipe(null, [
+            WhereUserId::class => $u->id,
+            TransactionsWhereType::class => 'purchase_token'
+        ]);
+        $chapterTransactions = TokenTransaction::pipe(null, [
+            WhereUserId::class => $u->id,
+            TransactionsWhereType::class => 'purchase_comic',
+            With::class => 'transactionable.comic'
+        ]);
 
-            return Inertia::render('MyTransactionsShow', [
-                'purchase_tokens' => $purchaseTransactions,
-                'purchase_chapters' => $chapterTransactions
-            ]);
-        }
-
-        abort(403, 'Unauthorized action.');
+        return Inertia::render('MyTransactionsShow', [
+            'purchase_tokens' => $purchaseTransactions,
+            'purchase_chapters' => $chapterTransactions
+        ]);
     }
 
     public function viewMyTokensShow(){
@@ -72,7 +71,8 @@ class ViewController extends Controller
             'user' => $u,
             'comic' => $comic,
             'comment_key' => $comic->getEncryptedKey(),
-            'comments' => $comments
+            'comments' => $comments,
+            // 'comic_purchased' => $u->checkComicPurchased($comic->id)
         ]);
     }
 
@@ -102,18 +102,19 @@ class ViewController extends Controller
             };
             return Inertia::render('PageShow', $param);
         }else{
-            $comic = $chapter->comic;
-            $comic->load(['chapters', 'authors']);
+            return Redirect::route('web.comic', ['comic' => $chapter->comic->id, 'error' => 'unpurchased']);
+            // $comic = $chapter->comic;
+            // $comic->load(['chapters', 'authors']);
 
-            $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();;
+            // $comments = $comic->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();;
 
-            return Inertia::render('ComicShow', [
-                'user' => $u,
-                'comic' => $comic,
-                'comment_key' => $comic->getEncryptedKey(),
-                'comments' => $comments,
-                'redirect_error' => 'chapter_unpurchased'
-            ]);
+            // return Inertia::render('ComicShow', [
+            //     'user' => $u,
+            //     'comic' => $comic,
+            //     'comment_key' => $comic->getEncryptedKey(),
+            //     'comments' => $comments,
+            //     'redirect_error' => 'chapter_unpurchased'
+            // ]);
         }
     }
 

@@ -12,7 +12,7 @@
                                 <div v-for="(cpt, idxCpt) in item.chapters" :key="'cart-' + idx + '-' + idxCpt" class="mb-2">
                                     {{item.title}} Ep. {{cpt}}
                                     <div class="float-right">
-                                        Rp. {{(item.price).toLocaleString('id-ID')}}
+                                        {{(item.price).toLocaleString('id-ID', {style: 'currency', currency: 'IDR'})}}
                                     </div>
                                     <select class="ml-3 text-sm" v-model="arSelected[item.id + '-' + cpt]">
                                         <option class="text-sm" selected>No Ar</option>
@@ -24,7 +24,7 @@
                         <div>
                             Total Items
                             <div class="float-right">
-                                Rp. {{(total).toLocaleString('id-ID')}}
+                                {{(total).toLocaleString('id-ID', {style: 'currency', currency: 'IDR'})}}
                             </div>
                         </div>
                     </div>

@@ -70,13 +70,16 @@
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                 <div class="text-xs px-0.5">{{helpers.compactFormatter(chapter.views)}}</div>
                             </div>
+                            <div v-if="chapter.token_price == 0 && false">
+                                free!
+                            </div>
                         </div>
                     </div>
                     <div class="w-2/5 flex justify-center items-center" >
-                        <button v-if="checkChapter(purchaseObj.chapters, chapter.id)" class="text-xs items-center min-h-8 w-116  p-2 rounded-lg text-gray-50 bg-purple-500 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="openModal(chapter)">Buy Ep. {{chapter.chapter}}</button>
+                        <button v-if="checkChapterUnpurchased(purchaseObj.chapters, chapter)" class="text-xs items-center min-h-8 w-116  p-2 rounded-lg text-gray-50 bg-purple-500 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="openModal(chapter)">Buy Ep. {{chapter.chapter}}</button>
                         <template v-else>
-                            <button v-if="checkArPuchased(chapter.id)" class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter.id, true)">Read Ep. {{chapter.chapter}} With AR</button>
-                            <button v-else class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter.id, false)">Read Ep. {{chapter.chapter}}</button>
+                            <button v-if="checkArPuchased(chapter.id)" class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter, true)">Read Ep. {{chapter.chapter}} With AR</button>
+                            <button v-else class="text-xs items-center h-auto w-116  p-2 rounded-lg text-gray-50 bg-green-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" @click="goToChapter(chapter, false)">Read Ep. {{chapter.chapter}}</button>
                         </template>
                         <!-- <button @click="openModal(preview.chapter)">Buy Episode</button> -->
                     </div>
@@ -158,7 +161,7 @@ export default {
             comic: {},
             bookmark: {},
             purchased: false,
-            purchaseObj: {},
+            purchaseObj: {ar:[]},
             authors: [],
             tags: [],
             chapters: [],
@@ -170,7 +173,7 @@ export default {
         }
     },
     created(){
-        if(_.has(this.$page.props, 'redirect_error')){
+        if(_.has(route().params, 'error') && route().params.error == 'unpurchased'){
             this.swal.fire({
                 icon: "error",
                 title: "You don\'t own this chapter!",
@@ -181,7 +184,6 @@ export default {
         this.comic = usePage().props.value.comic
         this.tags = JSON.parse(this.comic.tags)
         this.genres = JSON.parse(this.comic.genres)
-        this.chapters = this.comic.chapters
         let self = this
         this.emitter.on('closeModal', function(){
             self.modal = false
@@ -197,6 +199,7 @@ export default {
         .then((response) => {
             this.bookmark = response.data
         })
+        this.chapters = this.comic.chapters
         console.log(JSON.parse(this.user.favorites))
         this.subscribed = _.includes(JSON.parse(this.user.subscriptions).map(x => +x), this.comic.id)
         let favObj = JSON.parse(this.user.favorites)
@@ -279,8 +282,8 @@ export default {
                 this.tokenPrice = this.episodeModal.token_price
             }
         },
-        checkChapter(chapters, chapter){
-            return !_.includes(chapters, chapter)
+        checkChapterUnpurchased(chapters, chapter){
+            return !_.includes(chapters, chapter.id) && chapter.token_price != 0
         },
         addToCart(){
             let cart = JSON.parse(localStorage.getItem('cart') || '{}')
@@ -349,8 +352,8 @@ export default {
 
         },
         goToChapter(chapter, ar = false){
-            if(_.includes(this.purchaseObj.chapters, chapter)){
-                this.$inertia.visit(route('web.chapter', {comic: usePage().props.value.comic.id, chapter: chapter, ar: ar}))
+            if(!this.checkChapterUnpurchased(this.purchaseObj.chapters, chapter)){
+                this.$inertia.visit(route('web.chapter', {comic: usePage().props.value.comic.id, chapter: chapter.id, ar: ar}))
             }
             // this.$router.push({name: 'pageShow', params: {
             //     comicId: this.$route.params.comicId,

@@ -40,6 +40,7 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/my-comics', [ViewController::class, 'viewMyComicShow'])->name('web.mycomics');
     Route::get('/account', [ViewController::class, 'viewAccountShow'])->name('web.account');
     Route::get('/my-tokens', [ViewController::class, 'viewMyTokensShow'])->name('web.mytokens');
+    Route::get('/my-transactions', [ViewController::class, 'viewMyTransactionsShow'])->name('web.mytransactions');
 });
 
 Route::get('/about', [ViewController::class, 'viewAboutShow'])->name('web.aboutus');

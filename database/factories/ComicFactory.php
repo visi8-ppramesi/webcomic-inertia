@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Helpers\FloatingServices;
 use App\Models\Author;
 use App\Models\Comic;
 use App\Models\Genre;
@@ -39,7 +40,7 @@ class ComicFactory extends Factory
             // 'author_id' => $author->id,
             // 'price' => $this->faker->randomFloat(2, 0, 10),
             'cover_url' => '/storage/media/covers/' . rand(1,4) . '.jpg',
-            'views' => rand(0, 10000000)
+            'views' => FloatingServices::normalRandom(0, 1000000, 2)
         ];
     }
 }

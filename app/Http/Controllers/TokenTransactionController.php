@@ -37,7 +37,7 @@ class TokenTransactionController extends Controller
     }
 
     public function getUserTransactions(User $user){
-        if(Gate::allows('view-transactions')){
+        if(Gate::allows('view-transactions', $user)){
             return response()->json(TokenTransaction::pipe(null, [
                 WhereUserId::class => $user->id
             ]), 200);

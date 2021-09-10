@@ -8,6 +8,7 @@ use App\Filters\TransactionsWhereType;
 use App\Filters\WhereCreatedAfter;
 use App\Filters\WhereCreatedBefore;
 use App\Filters\WhereUserId;
+use App\Filters\With;
 use App\Traits\Pipeable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,6 +27,7 @@ class TokenTransaction extends Model
             WhereCreatedBefore::class,
             TransactionsWhereType::class,
             TransactionsWhereChapter::class,
+            With::class,
         ];
     }
 

@@ -26,7 +26,7 @@
                                 <li class="">{{priceObj.amount}} Coin</li>
                             </div>
                             <div class="flex items-center justify-end w-1/2">
-                                <button @click="buyTokens(priceObj.amount, priceObj.price)" class="bg-blue-500 w-24 text-center text-white rounded">Rp. {{priceObj.price.toLocaleString('id-ID')}}</button>
+                                <button @click="buyTokens(priceObj.amount, priceObj.price)" class="bg-blue-500 w-28 text-center text-white rounded">{{priceObj.price.toLocaleString('id-ID', {style: 'currency', currency: 'IDR'})}}</button>
                             </div>
                         </div>
                     </div>

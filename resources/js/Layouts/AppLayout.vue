@@ -81,31 +81,22 @@
             </div>
 
             <!-- Mobile menu, show/hide based on menu state. -->
-            <transition name="slide">
-                <div class="sm:hidden bg-gray-800 absolute w-full" id="mobile-menu" v-if="mobileMenuOpen">
-                    <div class="px-2 pt-2 pb-3 space-y-1">
-                        <Link :href="route('web.dashboard')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Dashboard</Link>
-                        <Link :href="route('web.mycomics')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">My Comics</Link>
-                        <Link :href="route('web.purchasetokens')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Purchase Tokens</Link>
-                        <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                        <!-- <router-link @click.native="mobileMenuOpen = false" :to="{name: 'dashboard'}" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Dashboard</router-link>
-                        <router-link :to="{}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Comics</router-link>
-                        <router-link :to="{}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Account</router-link> -->
-                    </div>
+            <div class="sm:hidden bg-gray-800 absolute w-full" id="mobile-menu" v-if="mobileMenuOpen">
+                <div class="px-2 pt-2 pb-3 space-y-1">
+                    <Link :href="route('web.dashboard')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Dashboard</Link>
+                    <Link :href="route('web.mycomics')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">My Comics</Link>
+                    <Link :href="route('web.mytransactions')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">My Transactions</Link>
+                    <Link :href="route('web.purchasetokens')" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Purchase Tokens</Link>
+                    <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
+                    <!-- <router-link @click.native="mobileMenuOpen = false" :to="{name: 'dashboard'}" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium" aria-current="page">Dashboard</router-link>
+                    <router-link :to="{}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Comics</router-link>
+                    <router-link :to="{}" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">My Account</router-link> -->
                 </div>
-            </transition>
+            </div>
         </nav>
         <div class="flex flex-col md:flex-row">
-            <!-- <div class="bg-gray-800 shadow-xl h-16 bottom-0 md:relative md:h-auto z-10 w-full md:w-48">
-                <div v-for="(item, idx) in items" :key="'link-' + idx" class="block py-1 md:py-3 pl-1 align-middle text-white no-underline hover:text-white border-b-2 border-gray-800 hover:border-pink-500">
-                    <router-link :to="item.path">{{item.name}}</router-link>
-                </div>
-            </div> -->
             <div class="max-w-full min-h-screen main-content flex-1 bg-gradient-to-t from-purple-800 to-indigo-900 md:pb-5 h-auto text-black">
-                <!-- <router-view :key="$route.fullPath"></router-view> -->
-                <!-- <div class="max-w-7xl mx-auto"> -->
-                    <slot :key="route().current()"></slot>
-                <!-- </div> -->
+                <slot :key="route().current()"></slot>
             </div>
         </div>
         <div class="w-100 bg-gray-800 divide-y text-center h-full">

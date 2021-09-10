@@ -35,12 +35,12 @@ class AuthServiceProvider extends ServiceProvider
             return $user->hasPermissionTo(Acl::PERMISSION_TRANSACTION_MANAGE);
         });
 
-        Gate::define('view-transactions', function (User $user){
+        Gate::define('view-transactions', function (User $user, User $requestUser){
             $u = auth()->user();
             if(empty($u)){
                 return false;
             }
-            return $u->hasPermissionTo(Acl::PERMISSION_TRANSACTION_MANAGE) || $u->id == $user->id;
+            return $u->hasPermissionTo(Acl::PERMISSION_TRANSACTION_MANAGE) || $u->id == $requestUser->id;
         });
 
         Gate::resource('comments_custom', CommentPolicy::class, [
