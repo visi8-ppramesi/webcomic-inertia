@@ -7,8 +7,11 @@ use App\Http\Controllers\PageController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\TokenTransactionController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\VoteController;
 use App\Models\Chapter;
+use App\Models\Genre;
+use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -92,3 +95,10 @@ Route::get('/chapter/checkar/{chapter}', [ChapterController::class, 'checkAr'])-
 Route::get('/comic/comments/{comic}', [ComicController::class, 'fetchComments'])->name('api.comic.fetch.comments');
 Route::get('/chapter/comments/{chapter}', [ChapterController::class, 'fetchComments'])->name('api.chapter.fetch.comments');
 Route::get('/search', [SearchController::class, 'fetchSearch'])->name('api.search');
+Route::get('/comic/image/{filename}', [FileController::class, 'fetch'])->name('api.image.fetch');
+Route::get('/genres', function(){
+    return response()->json(Genre::all());
+})->name('api.genres');
+Route::get('/tags', function(){
+    return response()->json(Tag::all());
+})->name('api.tags');

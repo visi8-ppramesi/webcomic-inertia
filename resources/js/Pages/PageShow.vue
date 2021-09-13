@@ -21,11 +21,11 @@
             <template v-for="(page, idx) in pages">
                 <div v-if="page.id in scenePages && isAr" :class="{glow: shownClass['ar-' + page.id], 'fill-width': !shownClass['ar-' + page.id]}" class="w-100 glow-animation" :key="'img-' + idx" :id="'ar-' + page.id">
                     <Link :href="route('web.scene', {page: page.id})">
-                        <img class="lg:object-fill lg:w-full" :src="page.image_url">
+                        <img class="lg:object-fill lg:w-full" :src="images[page.id]" @load="DRM.revokeImageBlob(images[page.id])">
                     </Link>
                 </div>
                 <div v-else :key="'img-' + idx">
-                    <img class="lg:object-fill lg:w-full" :src="page.image_url">
+                    <img class="lg:object-fill lg:w-full" :src="images[page.id]" @load="DRM.revokeImageBlob(images[page.id])">
                 </div>
             </template>
             <!-- <div :class="{glow: shownClass['ar-' + page.id], 'fill-width': !shownClass['ar-' + page.id]}" class="w-100 glow-animation" v-for="(page, idx) in pages" :key="'img-' + idx" :id="page.id in scenePages ? 'ar-' + page.id : null">
@@ -63,6 +63,7 @@ import Comments from '../Components/Comments.vue'
 export default {
     name:'page',
     props: ['comic', 'chapter', 'pages', 'ar'],
+    inject: ['DRM'],
     components:{
         AppLayout,
         AddNewComment,
@@ -79,10 +80,16 @@ export default {
             shownClass: {},
             arElems: {},
             isAr: false,
-            comments: []
+            comments: [],
+            images: {},
         }
     },
     methods:{
+        // revokeImage(url){
+        //     setTimeout(() => {
+        //         URL.revokeObjectURL(url)
+        //     }, 1)
+        // },
         changeChapter(newchapter){
             this.$inertia.visit(route('web.chapter', {comic: this.comic.id, chapter: newchapter}), {
                 onError: (e) => {
@@ -170,11 +177,13 @@ export default {
     destroyed(){
         window.removeEventListener('scroll', this.handleScroll)
     },
+    // beforeUnmount(){
+    //     this.DRM.destroyBlobImages()
+    // },
     mounted(){
         // window.addEventListener('scroll', this.handleScroll)
     },
     created(){
-        console.log(this.$page.props.error)
         this.comments = this.$page.props.comments
         this.isAr = this.ar === '1'
         this.chapters = this.comic.chapters
@@ -189,6 +198,19 @@ export default {
         //     this.nextEnabled = this.$route.params.chapter != this.chapters[this.chapters.length - 1]
         // })
         this.pages = this.$page.props.pages
+        this.pages.forEach((page, idx) => {
+            this.DRM.createImageBlob(page.image_url, page.id)
+            .then((blob) => {
+                // this.img = blob
+                this.images[page.id] = blob
+                // this.DRM.revokeImageBlob(blob)
+            })
+            // axios.get(page.image_url, { responseType: 'blob' })
+            // .then((resp) => {
+            //     this.images[page.id] = URL.createObjectURL(resp.data)
+            // })
+        })
+        // this.DRM.destroyBlobImages()
         // this.fetchPages(this.comic.id, this.chapter.id)
         // .then((resp) => {
         let k = {}

@@ -161,7 +161,9 @@ export default {
             comic: {},
             bookmark: {},
             purchased: false,
-            purchaseObj: {ar:[]},
+            purchaseObj: {
+                ar:[]
+            },
             authors: [],
             tags: [],
             chapters: [],
@@ -364,7 +366,7 @@ export default {
             // }})
         },
         checkArPuchased(chapter){
-            return this.purchaseObj.ar.map(x => +x).includes(chapter)
+            return !_.isEmpty(this.purchaseObj) && this.purchaseObj.ar.map(x => +x).includes(chapter)
         },
         purchaseChapter(){
             axios.post(route('api.chapter.purchase'), {

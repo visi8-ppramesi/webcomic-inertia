@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\FileController;
 use App\Http\Controllers\ViewController;
+use App\Models\Page;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -33,6 +35,7 @@ Route::get('/testing', [ViewController::class, 'viewTesting'])->name('web.testin
 
 Route::get('/', [ViewController::class, 'viewDashboard'])->name('web.dashboard');
 Route::middleware('auth:sanctum')->group(function(){
+    Route::get('/comics/{type?}/{value?}', [ViewController::class, 'viewComicsShow'])->name('web.comics');
     Route::get('/comic/{comic}', [ViewController::class, 'viewComicShow'])->name('web.comic');
     Route::get('/chapter/{comic}/{chapter}', [ViewController::class, 'viewChapterShow'])->name('web.chapter');
     Route::get('/tokens/purchase', [ViewController::class, 'viewPurchaseTokens'])->name('web.purchasetokens');
@@ -48,6 +51,14 @@ Route::get('/scene/{page}', [ViewController::class, 'viewSceneShow'])->name('web
 Route::get('/search', [ViewController::class, 'viewSearchShow'])->name('web.search');
 Route::get('/author/{author}', [ViewController::class, 'viewAuthorShow'])->name('web.author');
 Route::get('/privacy', [ViewController::class, 'viewPrivacyShow'])->name('web.privacypolicy');
+Route::get('/testing', function(){
+    return Inertia::render('Testing', [
+        'testing' => Page::find(1)
+    ]);
+})->name('web.testing');
+Route::get('/testing2', function(){
+    return Inertia::render('Testing2');
+})->name('web.testing2');
 
 // Route::get('/404', [ViewController::class, 'view404Show'])->name('web.notfound');
 

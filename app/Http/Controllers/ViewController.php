@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Filters\TransactionsWhereType;
+use App\Filters\WhereGenre;
+use App\Filters\WhereTag;
 use App\Filters\WhereUserId;
 use App\Filters\With;
 use App\Helpers\Query;
@@ -12,6 +14,7 @@ use App\Models\Comic;
 use App\Models\Page;
 use App\Models\Setting;
 use App\Models\Comment;
+use App\Models\Genre;
 use App\Models\TokenTransaction;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -60,6 +63,34 @@ class ViewController extends Controller
         ]);
     }
 
+    public function viewComicsShow(Request $request, $type = null, $value = null){
+        // $comicQuery = Comic::query();
+        // $data = [];
+        // if(!empty($type) && in_array($type, ['tag', 'genre', 'newest'])){
+        //     switch($type){
+        //         case 'tag':
+        //         case 'genre':
+        //             $comicQuery->whereJsonContains($type, $value);
+        //             break;
+        //         case 'newest':
+        //             break;
+        //     }
+        // }
+        $data = [
+            'type' => $type,
+            'value' => $value,
+            'genres' => Genre::all()
+        ];
+        if(!empty($type)){
+            $data['comics'] = Comic::pipe(null, [
+                'paginate' => 12,
+                'page' => 1,
+                WhereGenre::class => $value
+            ]);
+        }
+        return Inertia::render('ComicsShow', $data);
+    }
+
     public function viewComicShow(Comic $comic){
         $u = auth()->user();
         $comic->increment('views');
@@ -88,12 +119,18 @@ class ViewController extends Controller
         $comic->load('chapters');
         if($u->checkChapterPurchased($chapter->id)){
             $chapter->increment('views');
-            $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();;
+            $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();
+
+            $pages = $chapter->pages;
+            foreach($pages as $idx => $page){
+                $pages[$idx]['image_url'] = $page->getSignedImageUrl();
+            }
 
             $param = [
                 'comic' => $comic,
                 'chapter' => $chapter,
-                'pages' => $chapter->pages,
+                // 'pages' => $chapter->pages,
+                'pages' => $pages,
                 'comment_key' => $chapter->getEncryptedKey(),
                 'comments' => $comments
             ];
