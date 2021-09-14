@@ -95,7 +95,7 @@ Route::get('/chapter/checkar/{chapter}', [ChapterController::class, 'checkAr'])-
 Route::get('/comic/comments/{comic}', [ComicController::class, 'fetchComments'])->name('api.comic.fetch.comments');
 Route::get('/chapter/comments/{chapter}', [ChapterController::class, 'fetchComments'])->name('api.chapter.fetch.comments');
 Route::get('/search', [SearchController::class, 'fetchSearch'])->name('api.search');
-Route::get('/comic/image/{filename}', [FileController::class, 'fetch'])->name('api.image.fetch');
+Route::get('/comic/image/{filename}', [FileController::class, 'fetchPageImage'])->name('api.image.fetch');
 Route::get('/genres', function(){
     return response()->json(Genre::all());
 })->name('api.genres');

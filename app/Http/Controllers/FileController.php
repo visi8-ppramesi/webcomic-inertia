@@ -7,7 +7,7 @@ use Image;
 
 class FileController extends Controller
 {
-    public function fetch(Request $request, $filename){
+    public function fetchPageImage(Request $request, $filename){
         if(! $request->hasValidSignature()){
             abort(401);
         }

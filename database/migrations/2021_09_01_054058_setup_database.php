@@ -46,6 +46,10 @@ class SetupDatabase extends Migration
             ['price' => 15000, 'amount' => 250, 'special_tag' => 'best_offer'],
             ['price' => 30000, 'amount' => 1000, 'special_tag' => 'best_offer'],
         ]);
+        Setting::setValue('site.social_media_links', [
+            'facebook' => 'https://facebook.com',
+            'instagram' => 'https://instagram.com'
+        ]);
     }
 
     /**
