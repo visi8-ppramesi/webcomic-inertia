@@ -22803,23 +22803,44 @@ __webpack_require__.r(__webpack_exports__);
   props: ['testing'],
   data: function data() {
     return {
-      img: ''
+      img: '',
+      files: {},
+      count: 0
     };
   },
-  created: function created() {
-    var _this = this;
+  methods: {
+    go: function go() {
+      axios.post(route('api.testing'), {
+        files: this.files
+      }).then(function (resp) {
+        console.log(resp.data);
+      });
+    },
+    fileChange: function fileChange(e, n) {
+      var _this = this;
 
-    var r = (Math.random() + 1).toString(36).substring(7);
-    this.DRM.createImageBlob(this.testing.image_url, r).then(function (blob) {
-      console.log(blob);
-      _this.img = blob;
+      var files = e.target.files || e.dataTransfer.files; // this.testfile[n] = files[0]
 
-      _this.DRM.revokeImageBlob(blob);
-    });
+      Object.keys(files).forEach(function (key) {
+        _this.toBase64(files[key], _this.count);
+
+        _this.count += 1;
+      }); // this.toBase64(files, n)
+    },
+    toBase64: function toBase64(fileObj, idx) {
+      var _this2 = this;
+
+      var file = new FileReader();
+
+      file.onload = function (e) {
+        _this2.files[idx] = e.target.result;
+      };
+
+      file.readAsDataURL(fileObj);
+    }
   },
-  beforeUnmount: function beforeUnmount() {
-    this.DRM.destroyBlobImages();
-  }
+  created: function created() {},
+  beforeUnmount: function beforeUnmount() {}
 });
 
 /***/ }),
@@ -29523,29 +29544,27 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
-
-var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("heyo");
-
-var _hoisted_2 = ["src"];
+var _hoisted_1 = ["onChange"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_Link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Link");
-
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
-    href: _ctx.route('web.testing2')
-  }, {
-    "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [_hoisted_1];
-    }),
-    _: 1
-    /* STABLE */
-
-  }, 8
-  /* PROPS */
-  , ["href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    src: $data.img
-  }, null, 8
-  /* PROPS */
-  , _hoisted_2)], 64
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(10, function (n) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+      multiple: "",
+      ref: "testfile",
+      type: "file",
+      onChange: function onChange($event) {
+        return $options.fileChange($event, n);
+      },
+      key: n
+    }, null, 40
+    /* PROPS, HYDRATE_EVENTS */
+    , _hoisted_1);
+  }), 64
+  /* STABLE_FRAGMENT */
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[0] || (_cache[0] = function () {
+      return $options.go && $options.go.apply($options, arguments);
+    })
+  }, "go")], 64
   /* STABLE_FRAGMENT */
   );
 }
@@ -29693,10 +29712,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
 /***/ }),
 
-/***/ "./resources/js/DRM/DRM.js":
-/*!*********************************!*\
-  !*** ./resources/js/DRM/DRM.js ***!
-  \*********************************/
+/***/ "./resources/js/Utils/DRM.js":
+/*!***********************************!*\
+  !*** ./resources/js/Utils/DRM.js ***!
+  \***********************************/
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 "use strict";
@@ -29758,7 +29777,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! sweetalert2 */ "./node_modules/sweetalert2/dist/sweetalert2.all.js");
 /* harmony import */ var sweetalert2__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(sweetalert2__WEBPACK_IMPORTED_MODULE_5__);
 /* harmony import */ var _helpers__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./helpers */ "./resources/js/helpers.js");
-/* harmony import */ var _DRM_DRM__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./DRM/DRM */ "./resources/js/DRM/DRM.js");
+/* harmony import */ var _Utils_DRM__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./Utils/DRM */ "./resources/js/Utils/DRM.js");
 var _window$document$getE;
 
 __webpack_require__(/*! ./bootstrap */ "./resources/js/bootstrap.js");
@@ -29797,7 +29816,7 @@ var p = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.createInertiaApp
     window.l.config.globalProperties.$Swal = (sweetalert2__WEBPACK_IMPORTED_MODULE_5___default());
     window.l.provide('swal', (sweetalert2__WEBPACK_IMPORTED_MODULE_5___default()));
     window.l.provide('helpers', _helpers__WEBPACK_IMPORTED_MODULE_6__.default);
-    window.l.provide('DRM', _DRM_DRM__WEBPACK_IMPORTED_MODULE_7__.default); // window.l.use(store)
+    window.l.provide('DRM', _Utils_DRM__WEBPACK_IMPORTED_MODULE_7__.default); // window.l.use(store)
 
     window.l.use(vue3_mq__WEBPACK_IMPORTED_MODULE_4__.Vue3Mq, {
       preset: "tailwind"

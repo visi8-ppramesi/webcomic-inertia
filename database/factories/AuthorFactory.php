@@ -26,7 +26,7 @@ class AuthorFactory extends Factory
         return [
             'name' => $this->faker->firstName() . ' ' . $this->faker->lastName(),
             'email' => $this->faker->unique()->safeEmail(),
-            'social_media_links' => '[]',
+            'social_media_links' => '{}',
             'description' => $this->faker->paragraph(),
             'profile_picture_url' => '/storage/media/authors/alan_moore.jpg',
             'user_id' => $u->id

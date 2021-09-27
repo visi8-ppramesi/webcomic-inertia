@@ -150,7 +150,7 @@ class User extends Authenticatable //implements MustVerifyEmail
                 $arArr[] = $chapter;
             }
             $purchaseObject = [
-                'price' => $comicObj->price,
+                // 'price' => $comicObj->price,
                 'ar' => $arArr,
                 'id' => $comicId,
                 'date' => now(),
@@ -160,7 +160,7 @@ class User extends Authenticatable //implements MustVerifyEmail
         }else{
             $arArr = $ar ? [$chapter] : [];
             $purchaseObject = [
-                'price' => $comicObj->price,
+                // 'price' => $comicObj->price,
                 'ar' => $arArr,
                 'id' => $comicId,
                 'date' => now(),

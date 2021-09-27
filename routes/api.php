@@ -1,5 +1,7 @@
 <?php
 
+use App\Helpers\Helpers;
+use App\Helpers\Uploader;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\ChapterController;
 use App\Http\Controllers\ComicController;
@@ -13,7 +15,9 @@ use App\Models\Chapter;
 use App\Models\Genre;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -102,3 +106,12 @@ Route::get('/genres', function(){
 Route::get('/tags', function(){
     return response()->json(Tag::all());
 })->name('api.tags');
+
+Route::post('/testing', function(Request $request){
+    $input = $request->input();
+    $retval = [];
+    foreach($input['files'] as $idx => $file){
+        $retval[] = Uploader::saveBase64File($file, 'storage/media/');
+    }
+    return response()->json($retval, 200);
+})->name('api.testing');

@@ -74,7 +74,7 @@ class CreateContent extends Command
             'name' => 'Raiyan Laksamana',
             'email' => 'raiyan@visi8.com',
             'description' => 'CEO of Visi8',
-            'social_media_links' => '[]',
+            'social_media_links' => '{}',
             'profile_picture_url' => '/storage/media/authors/alan_moore.jpg'
         ]);
 
