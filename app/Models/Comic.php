@@ -7,6 +7,7 @@ use App\Filters\SortByPopular;
 use App\Filters\WhereGenre;
 use App\Filters\WhereTag;
 use App\Traits\Pipeable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use tizis\laraComments\Contracts\ICommentable;
@@ -51,5 +52,20 @@ class Comic extends Model implements ICommentable
 
     public function favorited(){
         return $this->belongsToMany(User::class);
+    }
+
+    /**
+     * The "booted" method of the model.
+     *
+     * @return void
+     */
+    protected static function booted()
+    {
+        static::addGlobalScope('draft', function (Builder $builder) {
+            if(!request()->has('is_draft')){
+                return $builder->where('is_draft', 0);
+            }
+            return $builder;
+        });
     }
 }
