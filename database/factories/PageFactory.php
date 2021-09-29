@@ -22,7 +22,7 @@ class PageFactory extends Factory
      */
     public function definition()
     {
-        $comic = Comic::with('chapters')->inRandomOrder()->first();
+        $comic = Comic::withoutGlobalScopes()->with('chapters')->inRandomOrder()->first();
         $chapter = $comic->chapters->random();
         return [
             'section' => $this->faker->randomDigit(),

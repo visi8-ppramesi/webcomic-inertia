@@ -29,7 +29,7 @@ class ChapterFactory extends Factory
      */
     public function definition()
     {
-        $comic = Comic::inRandomOrder()->first();
+        $comic = Comic::withoutGlobalScopes()->inRandomOrder()->first();
         return [
             'image_url' => '/storage/media/covers/' . rand(1,4) . '.jpg',
             'comic_id' => $comic->id,

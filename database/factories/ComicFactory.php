@@ -40,7 +40,8 @@ class ComicFactory extends Factory
             // 'author_id' => $author->id,
             // 'price' => $this->faker->randomFloat(2, 0, 10),
             'cover_url' => '/storage/media/covers/' . rand(1,4) . '.jpg',
-            'views' => FloatingServices::normalRandom(0, 1000000, 2)
+            'views' => FloatingServices::normalRandom(0, 1000000, 2),
+            'is_draft' => rand(0, 1),
         ];
     }
 }
