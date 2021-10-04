@@ -27,12 +27,17 @@ class UserPurchasesSeeder extends Seeder
         foreach(User::get() as $ukey => $user){
             $comicId = Comic::inRandomOrder()->first()->id;
             $user->toggleFavorite($comicId);
-            $user->purchaseToken($tokenPriceObj['amount'], $tokenPriceObj['price'], 'testing');
+            $user->purchaseToken(
+                $tokenPriceObj['amount'],
+                $tokenPriceObj['price'],
+                'testing',
+                \Carbon\Carbon::now()->addDays(random_int(-90, 0))
+            );
 
-            foreach(Comic::inRandomOrder()->take(5)->get() as $key => $comic){
+            foreach(Comic::inRandomOrder()->take(20)->get() as $key => $comic){
                 foreach($comic->chapters as $ckey => $chapter){
                     // echo $comic->id . ' ' . $chapter->id . PHP_EOL;
-                    $user->purchaseChapter($comic->id, $chapter->id);
+                    $user->purchaseChapter($comic->id, $chapter->id, false, \Carbon\Carbon::now()->addDays(random_int(-30, -1)));
                 }
             }
 

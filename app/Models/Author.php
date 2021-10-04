@@ -19,6 +19,10 @@ class Author extends Model
         ];
     }
 
+    public function tokenTransactions(){
+        return $this->belongsToMany(TokenTransaction::class);
+    }
+
     public function comics(){
         return $this->belongsToMany(Comic::class);
     }

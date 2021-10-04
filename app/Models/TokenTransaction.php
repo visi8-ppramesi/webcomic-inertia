@@ -31,6 +31,10 @@ class TokenTransaction extends Model
         ];
     }
 
+    public function authors(){
+        return $this->belongsToMany(Author::class);
+    }
+
     public function transactionable(){
         return $this->morphTo();
     }

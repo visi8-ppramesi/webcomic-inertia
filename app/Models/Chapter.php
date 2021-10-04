@@ -26,6 +26,10 @@ class Chapter extends Model implements ICommentable
         return $this->belongsTo(Comic::class);
     }
 
+    public function transactions(){
+        return $this->morphMany(TokenTransaction::class, 'transactionable');
+    }
+
     public function pages(){
         return $this->hasMany(Page::class);
     }
