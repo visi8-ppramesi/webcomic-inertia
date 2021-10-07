@@ -38,8 +38,15 @@ class DatabaseSeeder extends Seeder
         echo 'factory finished' . PHP_EOL;
 
         foreach(Comic::get() as $idx => $comic){
-            $authors = Author::inRandomOrder()->limit(2)->get()->pluck('id')->toArray();
-            $comic->authors()->sync($authors);
+            $authors = Author::inRandomOrder()->limit(2)->get()->pluck('id');
+
+            $mySplit = $authors->reduce(function($acc, $elem){
+                $acc[$elem] = 1/2;
+                return $acc;
+            }, []);
+            $comic->authors()->sync($authors->toArray());
+            $comic->author_split = json_encode($mySplit);
+            $comic->save();
             echo $comic->title . PHP_EOL;
         }
     }

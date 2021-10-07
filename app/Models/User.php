@@ -131,11 +131,18 @@ class User extends Authenticatable //implements MustVerifyEmail
         }
         $date = !empty($date) ? \Carbon\Carbon::parse($date) : \Carbon\Carbon::now();
 
-        try{
-            $split = 1 / $authors->count();//we should probably take care of this in the future just in case there's different split
-            $splitObj = $authors->mapWithKeys(function($v)use($split){return [$v => $split];})->all();
-        }catch(\Exception $e){
-            $splitObj = [];
+        $comicObj = Comic::findOrFail($comicId);
+        $splitObj = $comicObj->author_split;
+        if(gettype($splitObj) == 'string'){
+            $splitObj = json_decode($splitObj, true);
+        }
+        if(empty($splitObj)){
+            try{
+                $split = 1 / $authors->count();//we should probably take care of this in the future just in case there's different split
+                $splitObj = $authors->mapWithKeys(function($v)use($split){return [$v => $split];})->all();
+            }catch(\Exception $e){
+                $splitObj = [];
+            }
         }
         $descriptor = [
             'date' => $date,
@@ -157,7 +164,6 @@ class User extends Authenticatable //implements MustVerifyEmail
         $transaction->authors()->sync($authors);
 
         //then add comic to purchased list
-        $comicObj = Comic::findOrFail($comicId);
         $currentPurchaseObj = json_decode($this->purchase_history, true);
         // $jsonString = 'purchase_history->' . $comicId;
         if(array_key_exists($comicId, $currentPurchaseObj)){

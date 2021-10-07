@@ -42,6 +42,7 @@ class ComicFactory extends Factory
             'cover_url' => '/storage/media/covers/' . rand(1,4) . '.jpg',
             'views' => FloatingServices::normalRandom(0, 1000000, 2),
             'is_draft' => rand(0, 1),
+            'author_split' => '{}',
         ];
     }
 }
