@@ -21343,6 +21343,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
     localStorage.removeItem('lastPage');
     this.shownTags = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_3__.usePage)().props.value.tags;
+    this.banners = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_3__.usePage)().props.value.banners;
     this.shownTags.forEach(function (elem) {
       _this.comics[elem] = {};
       _this.comics[elem].comics = [];
@@ -21359,7 +21360,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   },
   data: function data() {
     return {
-      shownTags: ['ipsum', 'lorem'],
+      banners: {},
+      shownTags: [],
       authors: {
         all: {
           authors: []

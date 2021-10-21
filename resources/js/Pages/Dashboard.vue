@@ -145,6 +145,7 @@ export default {
     created(){
         localStorage.removeItem('lastPage')
         this.shownTags = usePage().props.value.tags
+        this.banners = usePage().props.value.banners
         this.shownTags.forEach((elem) => {
             this.comics[elem] = {}
             this.comics[elem].comics = []
@@ -156,9 +157,10 @@ export default {
     },
     data(){
         return {
+            banners: {
+
+            },
             shownTags: [
-                'ipsum',
-                'lorem'
             ],
             authors: {
                 all: {
