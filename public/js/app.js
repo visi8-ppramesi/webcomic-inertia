@@ -19204,6 +19204,9 @@ __webpack_require__.r(__webpack_exports__);
     // Navigation
 
   },
+  created: function created() {
+    console.log(this.banners);
+  },
   props: {
     banners: {
       type: Array,
@@ -20123,21 +20126,31 @@ __webpack_require__.r(__webpack_exports__);
     this.emitter.on('cartAddItem', function (e) {
       _this.countCartItems();
     });
+    axios.get(route('api.settings', 'site.social_media_links')).then(function (resp) {
+      _this.socials = Object.keys(resp.data).map(function (socname) {
+        var icon = socname in _this.icons ? _this.icons[socname] : _this.icons.visi8;
+        return {
+          name: socname,
+          link: resp.data[socname],
+          icon: icon["default"]
+        };
+      });
+    });
   },
   data: function data() {
     return {
       cartCount: 0,
-      items: [{
-        name: 'web.account',
-        title: 'My Account'
-      }],
       mobileMenuOpen: false,
       profileMenuOpen: false,
       isLoggedIn: false,
-      facebookIcon: __webpack_require__(/*! ../../icons/facebook.png */ "./resources/icons/facebook.png"),
-      instagramIcon: __webpack_require__(/*! ../../icons/instagram.png */ "./resources/icons/instagram.png"),
-      twitterIcon: __webpack_require__(/*! ../../icons/twitter.png */ "./resources/icons/twitter.png"),
-      visi8Icon: __webpack_require__(/*! ../../assets/visi8_logo.png */ "./resources/assets/visi8_logo.png")
+      icons: {
+        facebook: __webpack_require__(/*! ../../icons/facebook.png */ "./resources/icons/facebook.png"),
+        instagram: __webpack_require__(/*! ../../icons/instagram.png */ "./resources/icons/instagram.png"),
+        twitter: __webpack_require__(/*! ../../icons/twitter.png */ "./resources/icons/twitter.png"),
+        visi8: __webpack_require__(/*! ../../assets/visi8_logo.png */ "./resources/assets/visi8_logo.png")
+      },
+      visi8Icon: __webpack_require__(/*! ../../assets/visi8_logo.png */ "./resources/assets/visi8_logo.png"),
+      socials: []
     };
   }
 });
@@ -24560,9 +24573,8 @@ var _hoisted_48 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNo
 var _hoisted_49 = {
   "class": "flex w-full flex flex-row items-center justify-center mt-2"
 };
-var _hoisted_50 = ["src"];
+var _hoisted_50 = ["href"];
 var _hoisted_51 = ["src"];
-var _hoisted_52 = ["src"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Link");
 
@@ -24750,22 +24762,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   }, 8
   /* PROPS */
-  , ["href"])]), _hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    "class": "w-12",
-    src: $data.facebookIcon["default"]
-  }, null, 8
-  /* PROPS */
-  , _hoisted_50), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    "class": "w-12",
-    src: $data.instagramIcon["default"]
-  }, null, 8
-  /* PROPS */
-  , _hoisted_51), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
-    "class": "w-12",
-    src: $data.twitterIcon["default"]
-  }, null, 8
-  /* PROPS */
-  , _hoisted_52)])])])]);
+  , ["href"])]), _hoisted_46, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_47, [_hoisted_48, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_49, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.socials, function (soc, idx) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("a", {
+      key: 'soc-' + idx,
+      href: soc.link
+    }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("img", {
+      "class": "w-12",
+      src: soc.icon
+    }, null, 8
+    /* PROPS */
+    , _hoisted_51)], 8
+    /* PROPS */
+    , _hoisted_50);
+  }), 128
+  /* KEYED_FRAGMENT */
+  )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <img class=\"w-12\" :src=\"facebookIcon.default\" />\n                    <img class=\"w-12\" :src=\"instagramIcon.default\" />\n                    <img class=\"w-12\" :src=\"twitterIcon.default\" /> ")])])])]);
 }
 
 /***/ }),
@@ -27038,7 +27049,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_app_layout, null, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_banner)]),  false ? (0) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_banner, {
+        banners: $data.banners
+      }, null, 8
+      /* PROPS */
+      , ["banners"])]),  false ? (0) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
         target: "sm-",
         tag: "span"
       }, {

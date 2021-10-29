@@ -35,6 +35,9 @@ export default {
         // Pagination,
         // Navigation
     },
+    created(){
+        console.log(this.banners)
+    },
     props: {
         banners: {
             type: Array,

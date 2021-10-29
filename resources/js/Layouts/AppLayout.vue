@@ -115,9 +115,12 @@
             <div class="py-2">
                 Follow Us On
                 <div class="flex w-full flex flex-row items-center justify-center mt-2">
-                    <img class="w-12" :src="facebookIcon.default" />
+                    <a v-for="(soc, idx) in socials" :key="'soc-' + idx" :href="soc.link">
+                        <img class="w-12" :src="soc.icon" />
+                    </a>
+                    <!-- <img class="w-12" :src="facebookIcon.default" />
                     <img class="w-12" :src="instagramIcon.default" />
-                    <img class="w-12" :src="twitterIcon.default" />
+                    <img class="w-12" :src="twitterIcon.default" /> -->
                 </div>
             </div>
         </div>
@@ -153,20 +156,32 @@ export default {
         this.emitter.on('cartAddItem', (e) => {
             this.countCartItems()
         })
+        axios.get(route('api.settings', 'site.social_media_links'))
+            .then((resp) => {
+                this.socials = Object.keys(resp.data).map((socname) => {
+                    const icon = socname in this.icons ? this.icons[socname] : this.icons.visi8
+                    return {
+                        name: socname,
+                        link: resp.data[socname],
+                        icon: icon.default
+                    }
+                })
+            })
     },
     data() {
         return {
             cartCount: 0,
-            items: [
-                {name: 'web.account', title: 'My Account'}
-            ],
             mobileMenuOpen: false,
             profileMenuOpen: false,
             isLoggedIn: false,
-            facebookIcon: require('../../icons/facebook.png'),
-            instagramIcon: require('../../icons/instagram.png'),
-            twitterIcon: require('../../icons/twitter.png'),
-            visi8Icon: require('../../assets/visi8_logo.png')
+            icons: {
+                facebook: require('../../icons/facebook.png'),
+                instagram: require('../../icons/instagram.png'),
+                twitter: require('../../icons/twitter.png'),
+                visi8: require('../../assets/visi8_logo.png')
+            },
+            visi8Icon: require('../../assets/visi8_logo.png'),
+            socials: [],
         }
     }
 }
