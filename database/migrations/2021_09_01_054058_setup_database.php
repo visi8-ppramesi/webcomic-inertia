@@ -26,7 +26,7 @@ class SetupDatabase extends Migration
             'password' => Hash::make('123qweasd'),
             'remember_token' => Str::random(10),
             'purchase_history' => '{}',
-            'read_history' => '[]',
+            'read_history' => '{}',
             'total_tokens' => 0,
             'subscriptions' => '[]',
             'favorites' => json_encode(['comics' => [], 'chapters' => []]),
@@ -38,6 +38,7 @@ class SetupDatabase extends Migration
         Setting::setValue('dashboard.tags', []);
         Setting::setValue('dashboard.genres', []);
         Setting::setValue('dashboard.banners', []);
+        Setting::setValue('dashboard.popular_comics', []);
         Setting::setValue('token.prices', [
             ['price' => 5000, 'amount' => 50],
             ['price' => 7000, 'amount' => 100],

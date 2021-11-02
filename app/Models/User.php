@@ -75,12 +75,12 @@ class User extends Authenticatable //implements MustVerifyEmail
         return $this->hasOne(Author::class);
     }
 
-    public function readComic($comicId){
+    public function readComic($comicId, $chapterId){
         $history = json_decode($this->read_history, true);
 
-        if(!in_array($comicId, $history)){
-            $history[] = $comicId;
-            $this->read_history = $history;
+        if(empty($history[$comicId]) || !in_array($chapterId, $history[$comicId])){
+            $history[$comicId][] = $chapterId;
+            $this->read_history = json_encode($history);
             $this->save();
         }
     }

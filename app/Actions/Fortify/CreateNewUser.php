@@ -32,7 +32,7 @@ class CreateNewUser implements CreatesNewUsers
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
             'purchase_history' => '{}',
-            'read_history' => '[]',
+            'read_history' => '{}',
             'total_tokens' => 0,
             'subscriptions' => '[]',
             'favorites' => json_encode(['comics' => [], 'chapters' => []]),

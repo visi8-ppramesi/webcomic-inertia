@@ -45,32 +45,6 @@
                         </div>
                     </mq-responsive>
                 </div>
-                <div class="mb-3 text-white" v-for="(tag, idx) in shownTags" :key="'tag-' + idx">
-                    <div>
-                        <div class="text-white float-right">More</div>
-                        <div>{{tag}}</div>
-                    </div>
-                    <mq-responsive target="sm-" tag="span">
-                        <div>
-                            <horizontal-slider
-                                :items="processToHorizontalSlider(comics[tag])"
-                                :config="config"
-                                :objectCategory="tag"
-                                @nextPage="nextPage"
-                            ></horizontal-slider>
-                        </div>
-                    </mq-responsive>
-                    <mq-responsive target="md+" tag="span">
-                        <div>
-                            <grid
-                                :items="processToHorizontalSlider(comics[tag])"
-                                :config="config"
-                                :objectCategory="tag"
-                                @nextPage="nextPage"
-                            ></grid>
-                        </div>
-                    </mq-responsive>
-                </div>
                 <div class="mb-3 text-white">
                     <div>
                         <div class="text-white float-right">More</div>
@@ -92,6 +66,32 @@
                                 :items="processToHorizontalSlider(comics.popular)"
                                 :config="config"
                                 objectCategory="popular"
+                                @nextPage="nextPage"
+                            ></grid>
+                        </div>
+                    </mq-responsive>
+                </div>
+                <div class="mb-3 text-white" v-for="(tag, idx) in shownTags" :key="'tag-' + idx">
+                    <div>
+                        <div class="text-white float-right">More</div>
+                        <div>{{tag}}</div>
+                    </div>
+                    <mq-responsive target="sm-" tag="span">
+                        <div>
+                            <horizontal-slider
+                                :items="processToHorizontalSlider(comics[tag])"
+                                :config="config"
+                                :objectCategory="tag"
+                                @nextPage="nextPage"
+                            ></horizontal-slider>
+                        </div>
+                    </mq-responsive>
+                    <mq-responsive target="md+" tag="span">
+                        <div>
+                            <grid
+                                :items="processToHorizontalSlider(comics[tag])"
+                                :config="config"
+                                :objectCategory="tag"
                                 @nextPage="nextPage"
                             ></grid>
                         </div>

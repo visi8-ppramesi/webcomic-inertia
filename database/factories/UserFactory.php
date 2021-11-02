@@ -32,7 +32,7 @@ class UserFactory extends Factory
             'password' => Hash::make('123qweasd'), // password
             'remember_token' => Str::random(10),
             'purchase_history' => '{}',
-            'read_history' => '[]',
+            'read_history' => '{}',
             'total_tokens' => 100,
             'subscriptions' => '[]',
             'favorites' => json_encode(['comics' => [], 'chapters' => []]),

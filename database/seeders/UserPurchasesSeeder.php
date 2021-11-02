@@ -38,6 +38,7 @@ class UserPurchasesSeeder extends Seeder
                 foreach($comic->chapters as $ckey => $chapter){
                     // echo $comic->id . ' ' . $chapter->id . PHP_EOL;
                     $user->purchaseChapter($comic->id, $chapter->id, false, \Carbon\Carbon::now()->addDays(random_int(-30, -1)));
+                    $user->readComic($comic->id, $chapter->id);
                 }
             }
 

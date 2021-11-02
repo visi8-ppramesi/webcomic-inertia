@@ -118,6 +118,7 @@ class ViewController extends Controller
         $u = auth()->user();
         $comic->load('chapters');
         if($u->checkChapterPurchased($chapter->id)){
+            $u->readComic($comic->id, $chapter->id);
             $chapter->increment('views');
             $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();
 
