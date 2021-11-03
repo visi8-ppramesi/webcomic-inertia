@@ -21273,36 +21273,132 @@ __webpack_require__.r(__webpack_exports__);
     AppLayout: _Layouts_AppLayout_vue__WEBPACK_IMPORTED_MODULE_0__.default,
     HorizontalMenu: _Components_HorizontalMenu_vue__WEBPACK_IMPORTED_MODULE_2__.default
   },
-  props: ['type', 'value', 'genres', 'comics'],
+  props: ['type', 'value'],
   created: function created() {
-    this.processedGenres = this.genres.map(function (el) {
-      var k = Object.assign({}, el);
-      k.link = route('web.comics', {
-        type: 'genre',
-        value: el.name
-      });
-      return k;
-    });
+    switch (this.type) {
+      case 'newest':
+        this.title = 'Newest Comics';
+        this.queryParams = {
+          paginate: 12,
+          page: 1,
+          sort_by_desc: 'created_at'
+        };
+        break;
 
-    if (!_.isNull(this.type) && _.includes(['tag', 'genre', 'newest'], this.type)) {} else {// Promise.all([
-      //     axios.get(route('api.tags')),
-      //     axios.get(route('api.genres'))
-      // ])
-      // .then(axios.spread((tagsResponse, genresResponse) => {
-      //     this.tags = tagsResponse.data
-      //     this.genres = genresResponse.data
-      // }))
+      case 'tag':
+        this.title = 'Comics Tagged ' + this.value.toUppercase();
+        this.queryParams = {
+          paginate: 12,
+          page: 1,
+          where_tag: this.value
+        };
+        break;
+
+      case 'genre':
+        this.title = 'Comics Genre ' + this.value.toUppercase();
+        this.queryParams = {
+          paginate: 12,
+          page: 1,
+          where_genre: this.value
+        };
+        break;
+
+      case 'popular':
+        this.title = 'Popular Comics';
+        this.queryParams = {
+          paginate: 12,
+          page: 1,
+          sort_by_popular: 1
+        };
+        break;
+
+      case 'recommended':
+        this.title = 'Recommended For You';
+        this.queryParams = {
+          paginate: 12,
+          page: 1,
+          recommended_comics: 1
+        };
+        break;
+
+      default:
+        this.title = 'All Comics';
+        this.queryParams = {
+          paginate: 12,
+          page: 1
+        };
+        break;
     }
+
+    this.getComics(route('api.comics.list', this.queryParams), 'all'); // this.processedGenres = this.genres.map((el) => {
+    //     let k = Object.assign({}, el)
+    //     k.link = route('web.comics', {type: 'genre', value: el.name})
+    //     return k
+    // })
+    // if(!_.isNull(this.type) && _.includes(['tag', 'genre', 'newest'], this.type)){
+    // }else{
+    //     // Promise.all([
+    //     //     axios.get(route('api.tags')),
+    //     //     axios.get(route('api.genres'))
+    //     // ])
+    //     // .then(axios.spread((tagsResponse, genresResponse) => {
+    //     //     this.tags = tagsResponse.data
+    //     //     this.genres = genresResponse.data
+    //     // }))
+    // }
   },
   methods: {
-    processItems: function processItems(item, category) {
+    processItems: function processItems(comicObjects) {
+      var retVal = [];
+      comicObjects.comics.forEach(function (element) {
+        retVal.push({
+          url: '/comic/' + element.id,
+          cover_url: element.cover_url,
+          title: element.title
+        });
+      });
       return {
-        items: item
+        items: retVal,
+        nextPageUrl: comicObjects.nextPageUrl
       };
+    },
+    getComics: function getComics(url, category) {
+      var _this = this;
+
+      axios.get(url).then(function (response) {
+        if (!_this.comics[category]) {
+          _this.comics[category] = {};
+          _this.comics[category].comics = response.data.data;
+        } else {
+          _this.comics[category].comics = _this.comics[category].comics.concat(response.data.data);
+        }
+
+        _this.comics[category].paginationData = response.data;
+        _this.comics[category].prevDisabled = _this.comics[category].paginationData.prev_page_url === null;
+        _this.comics[category].nextDisabled = _this.comics[category].paginationData.next_page_url === null;
+        _this.comics[category].prevPageUrl = _this.comics[category].paginationData.prev_page_url;
+        _this.comics[category].nextPageUrl = _this.comics[category].paginationData.next_page_url;
+      })["catch"](function (error) {//do error catching later
+      });
+    },
+    nextPage: function nextPage(category) {
+      if (!this.comics[category].nextDisabled) {
+        this.getComics(this.comics[category].nextPageUrl, category);
+      }
     }
   },
   data: function data() {
     return {
+      title: '',
+      comics: {
+        all: {
+          comics: []
+        }
+      },
+      queryParams: {
+        paginate: 12,
+        page: 2
+      },
       config: {
         image: 'cover_url',
         title: 'title'
@@ -21368,6 +21464,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     this.getComics(route('api.comics.list', _objectSpread(_objectSpread({}, this.query), {}, {
       sort_by_popular: 1
     })), 'popular');
+    this.getComics(route('api.comics.list', _objectSpread(_objectSpread({}, this.query), {}, {
+      recommended_comics: 1
+    })), 'recommended');
     this.getComics(route('api.comics.list', this.query), 'all');
     this.getAuthors(route('api.authors.list', this.query), 'all');
   },
@@ -21385,6 +21484,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           comics: []
         },
         popular: {
+          comics: []
+        },
+        recommended: {
           comics: []
         }
       },
@@ -26921,31 +27023,32 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
-
-var _hoisted_1 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_1 = {
+  "class": "mb-3 text-white"
+};
+var _hoisted_2 = {
   "class": "px-5 py-5"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <grid\n                :items=\"processItems(comics)\"\n                :config=\"config\"\n                objectCategory=\"favorited\"\n            ></grid> ")], -1
+};
+
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Popular")], -1
 /* HOISTED */
 );
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_horizontal_menu = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("horizontal-menu");
+  var _component_grid = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("grid");
 
   var _component_app_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("app-layout");
 
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)(_component_app_layout, null, {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_menu, {
-        items: $data.processedGenres,
-        config: {
-          title: 'name',
-          link: 'link',
-          selected: 'name'
-        },
-        selected: $props.value
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [_hoisted_3, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_grid, {
+        items: $options.processItems($data.comics.all),
+        config: $data.config,
+        objectCategory: "all",
+        onNextPage: $options.nextPage
       }, null, 8
       /* PROPS */
-      , ["items", "selected"]), _hoisted_1];
+      , ["items", "config", "onNextPage"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <horizontal-menu\n            :items=\"processedGenres\"\n            :config=\"{\n                title: 'name',\n                link: 'link',\n                selected: 'name'\n            }\"\n            :selected=\"value\"\n        ></horizontal-menu> ")];
     }),
     _: 1
     /* STABLE */
@@ -27001,15 +27104,9 @@ var _hoisted_8 = {
   "class": "mb-3 text-white"
 };
 
-var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "text-white float-right"
-}, "More"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "New Releases")], -1
-/* HOISTED */
-);
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("More");
 
-var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "text-white float-right"
-}, "More", -1
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "New Releases", -1
 /* HOISTED */
 );
 
@@ -27017,20 +27114,32 @@ var _hoisted_11 = {
   "class": "mb-3 text-white"
 };
 
-var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
-  "class": "text-white float-right"
-}, "More"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Popular")], -1
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("More");
+
+var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Popular", -1
 /* HOISTED */
 );
 
-var _hoisted_13 = {
+var _hoisted_14 = {
+  "class": "mb-3 text-white"
+};
+
+var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("More");
+
+var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Recommended for you", -1
+/* HOISTED */
+);
+
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("More");
+
+var _hoisted_18 = {
   "class": "px-5 py-5 bg-gray-100"
 };
-var _hoisted_14 = {
+var _hoisted_19 = {
   "class": "mb-3"
 };
 
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_20 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "float-right"
 }, "More"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, "Authors")], -1
 /* HOISTED */
@@ -27038,6 +27147,8 @@ var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_banner = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("banner");
+
+  var _component_Link = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Link");
 
   var _component_horizontal_slider = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("horizontal-slider");
 
@@ -27053,7 +27164,21 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         banners: $data.banners
       }, null, 8
       /* PROPS */
-      , ["banners"])]),  false ? (0) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
+      , ["banners"])]),  false ? (0) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
+        "class": "text-white float-right",
+        href: _ctx.route('web.comics', {
+          type: 'newest'
+        })
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [_hoisted_9];
+        }),
+        _: 1
+        /* STABLE */
+
+      }, 8
+      /* PROPS */
+      , ["href"]), _hoisted_10]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
         target: "sm-",
         tag: "span"
       }, {
@@ -27087,11 +27212,122 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         _: 1
         /* STABLE */
 
+      })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
+        "class": "text-white float-right",
+        href: _ctx.route('web.comics', {
+          type: 'popular'
+        })
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [_hoisted_12];
+        }),
+        _: 1
+        /* STABLE */
+
+      }, 8
+      /* PROPS */
+      , ["href"]), _hoisted_13]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
+        target: "sm-",
+        tag: "span"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
+            items: $options.processToHorizontalSlider($data.comics.popular),
+            config: $data.config,
+            objectCategory: "popular",
+            onNextPage: $options.nextPage
+          }, null, 8
+          /* PROPS */
+          , ["items", "config", "onNextPage"])])];
+        }),
+        _: 1
+        /* STABLE */
+
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
+        target: "md+",
+        tag: "span"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_grid, {
+            items: $options.processToHorizontalSlider($data.comics.popular),
+            config: $data.config,
+            objectCategory: "popular",
+            onNextPage: $options.nextPage
+          }, null, 8
+          /* PROPS */
+          , ["items", "config", "onNextPage"])])];
+        }),
+        _: 1
+        /* STABLE */
+
+      })]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
+        "class": "text-white float-right",
+        href: _ctx.route('web.comics', {
+          type: 'recommended'
+        })
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [_hoisted_15];
+        }),
+        _: 1
+        /* STABLE */
+
+      }, 8
+      /* PROPS */
+      , ["href"]), _hoisted_16]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
+        target: "sm-",
+        tag: "span"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
+            items: $options.processToHorizontalSlider($data.comics.recommended),
+            config: $data.config,
+            objectCategory: "recommended",
+            onNextPage: $options.nextPage
+          }, null, 8
+          /* PROPS */
+          , ["items", "config", "onNextPage"])])];
+        }),
+        _: 1
+        /* STABLE */
+
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
+        target: "md+",
+        tag: "span"
+      }, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_grid, {
+            items: $options.processToHorizontalSlider($data.comics.recommended),
+            config: $data.config,
+            objectCategory: "recommended",
+            onNextPage: $options.nextPage
+          }, null, 8
+          /* PROPS */
+          , ["items", "config", "onNextPage"])])];
+        }),
+        _: 1
+        /* STABLE */
+
       })]), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($data.shownTags, function (tag, idx) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           "class": "mb-3 text-white",
           key: 'tag-' + idx
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(tag), 1
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
+          "class": "text-white float-right",
+          href: _ctx.route('web.comics', {
+            type: 'tag',
+            value: tag.toLowerCase()
+          })
+        }, {
+          "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+            return [_hoisted_17];
+          }),
+          _: 2
+          /* DYNAMIC */
+
+        }, 1032
+        /* PROPS, DYNAMIC_SLOTS */
+        , ["href"]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(tag), 1
         /* TEXT */
         )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
           target: "sm-",
@@ -27134,41 +27370,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         )]);
       }), 128
       /* KEYED_FRAGMENT */
-      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_11, [_hoisted_12, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
-        target: "sm-",
-        tag: "span"
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
-            items: $options.processToHorizontalSlider($data.comics.popular),
-            config: $data.config,
-            objectCategory: "popular",
-            onNextPage: $options.nextPage
-          }, null, 8
-          /* PROPS */
-          , ["items", "config", "onNextPage"])])];
-        }),
-        _: 1
-        /* STABLE */
-
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
-        target: "md+",
-        tag: "span"
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_grid, {
-            items: $options.processToHorizontalSlider($data.comics.popular),
-            config: $data.config,
-            objectCategory: "popular",
-            onNextPage: $options.nextPage
-          }, null, 8
-          /* PROPS */
-          , ["items", "config", "onNextPage"])])];
-        }),
-        _: 1
-        /* STABLE */
-
-      })])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [_hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
+      ))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_18, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_19, [_hoisted_20, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
         target: "sm-",
         tag: "span"
       }, {
@@ -29433,10 +29635,6 @@ var _hoisted_7 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 );
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  var _component_horizontal_slider = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("horizontal-slider");
-
-  var _component_mq_responsive = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("mq-responsive");
-
   var _component_grid = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("grid");
 
   var _component_app_layout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("app-layout");
@@ -29462,41 +29660,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 absolute bg-transparent rounded text-base items-center justify-center w-8 right-0 pr-3 py-3"
       }, _hoisted_3)]), $data.searching ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, "search result of \"" + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($props.query) + "\"", 1
       /* TEXT */
-      )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.searching ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
-        target: "sm-",
-        tag: "span"
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_horizontal_slider, {
-            items: $options.processToHorizontalSlider($data.comics),
-            config: $data.config,
-            objectCategory: "all",
-            onNextPage: $options.nextPage
-          }, null, 8
-          /* PROPS */
-          , ["items", "config", "onNextPage"])])];
-        }),
-        _: 1
-        /* STABLE */
-
-      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_mq_responsive, {
-        target: "md+",
-        tag: "span"
-      }, {
-        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-          return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_grid, {
-            items: $options.processToHorizontalSlider($data.comics),
-            config: $data.config,
-            objectCategory: "all",
-            onNextPage: $options.nextPage
-          }, null, 8
-          /* PROPS */
-          , ["items", "config", "onNextPage"])])];
-        }),
-        _: 1
-        /* STABLE */
-
-      })])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+      )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $data.searching ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [_hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <mq-responsive target=\"sm-\" tag=\"span\">\n                    <div>\n                        <horizontal-slider\n                            :items=\"processToHorizontalSlider(comics)\"\n                            :config=\"config\"\n                            objectCategory=\"all\"\n                            @nextPage=\"nextPage\"\n                        ></horizontal-slider>\n                    </div>\n                </mq-responsive>\n                <mq-responsive target=\"md+\" tag=\"span\"> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_grid, {
+        items: $options.processToHorizontalSlider($data.comics),
+        config: $data.config,
+        objectCategory: "all",
+        onNextPage: $options.nextPage
+      }, null, 8
+      /* PROPS */
+      , ["items", "config", "onNextPage"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" </mq-responsive> ")])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1
     /* STABLE */

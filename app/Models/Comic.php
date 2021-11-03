@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Filters\Get;
+use App\Filters\RecommendedComics;
 use App\Filters\SortByPopular;
 use App\Filters\WhereGenre;
 use App\Filters\WhereTag;
@@ -26,6 +27,7 @@ class Comic extends Model implements ICommentable
             WhereTag::class,
             WhereGenre::class,
             SortByPopular::class,
+            RecommendedComics::class,
         ];
     }
 

@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Filters\RecommendedComics;
+use App\Filters\SortByDesc;
+use App\Filters\SortByPopular;
 use App\Filters\TransactionsWhereType;
 use App\Filters\WhereGenre;
 use App\Filters\WhereTag;
@@ -78,16 +81,58 @@ class ViewController extends Controller
         // }
         $data = [
             'type' => $type,
-            'value' => $value,
-            'genres' => Genre::all()
+            'value' => $value
         ];
-        if(!empty($type)){
-            $data['comics'] = Comic::pipe(null, [
-                'paginate' => 12,
-                'page' => 1,
-                WhereGenre::class => $value
-            ]);
-        }
+        // if(!empty($type)){
+        //     $data['comics'] = Comic::pipe(null, [
+        //         'paginate' => 12,
+        //         'page' => 1,
+        //         WhereTag::class => $value
+        //     ]);
+        // }
+        // switch($type){
+        //     case 'newest':
+        //         $data['comics'] = Comic::pipe(null, [
+        //             'paginate' => 12,
+        //             'page' => 1,
+        //             SortByDesc::class => 'created_at'
+        //         ]);
+        //         break;
+        //     case 'tag':
+        //         $data['comics'] = Comic::pipe(null, [
+        //             'paginate' => 12,
+        //             'page' => 1,
+        //             WhereTag::class => $value
+        //         ]);
+        //         break;
+        //     case 'genre':
+        //         $data['comics'] = Comic::pipe(null, [
+        //             'paginate' => 12,
+        //             'page' => 1,
+        //             WhereGenre::class => $value
+        //         ]);
+        //         break;
+        //     case 'popular':
+        //         $data['comics'] = Comic::pipe(null, [
+        //             'paginate' => 12,
+        //             'page' => 1,
+        //             SortByPopular::class => 1
+        //         ]);
+        //         break;
+        //     case 'recommended':
+        //         $data['comics'] = Comic::pipe(null, [
+        //             'paginate' => 12,
+        //             'page' => 1,
+        //             RecommendedComics::class => $value
+        //         ]);
+        //         break;
+        //     default:
+        //         $data['comics'] = Comic::pipe(null, [
+        //             'paginate' => 12,
+        //             'page' => 1
+        //         ]);
+        //         break;
+        // }
         return Inertia::render('ComicsShow', $data);
     }
 

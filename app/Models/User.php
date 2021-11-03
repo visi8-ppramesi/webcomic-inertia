@@ -313,4 +313,48 @@ class User extends Authenticatable //implements MustVerifyEmail
         }
         return false;
     }
+
+    public function getRecommendedComics(){
+        $neighbors = json_decode($this->nearest_neighbors);
+        $neighUsers = self::whereIn('id', $neighbors)->orderByRaw("FIELD(id, " . implode(',', $neighbors) . ")")->get()->pluck('read_history');
+        $count = $neighUsers->count();
+        $sum = $count * ($count + 1) / 2;
+        $comics = Comic::get()->pluck('id')->toArray();
+        $weightedComics = $neighUsers->map(function($item, $index)use($sum, $comics){
+            $weight = (50 - $index) / $sum;
+            $hist = json_decode($item, true);
+            $retVal = [];
+            foreach($comics as $comic){
+                if(empty($hist[$comic])){
+                    $retVal[$comic] = 0;
+                }else{
+                    $retVal[$comic] = count($hist[$comic]) * $weight;
+                }
+            }
+            return $retVal;
+        })->reduce(function($acc, $item){
+            foreach($item as $comicId => $val){
+                if(empty($acc[$comicId])){
+                    $acc[$comicId] = $val;
+                }else{
+                    $acc[$comicId] += $val;
+                }
+            }
+            return $acc;
+        }, []);
+        $uReadHist = collect(json_decode($this->read_history, true))->map(function($val){
+            return count($val);
+        });
+        $diff = [];
+        foreach($comics as $comic){
+            if(empty($uReadHist[$comic])){
+                $diff[$comic] = round(-1 * $weightedComics[$comic], 2);
+            }else{
+                $diff[$comic] = round($uReadHist[$comic] - $weightedComics[$comic], 2);
+            }
+        }
+        asort($diff);
+        $diff = array_keys($diff);
+        return $diff;
+    }
 }

@@ -15,7 +15,7 @@
                     <div class="text-white float-right">More</div>
                     <div>Comic Search Results</div>
                 </div>
-                <mq-responsive target="sm-" tag="span">
+                <!-- <mq-responsive target="sm-" tag="span">
                     <div>
                         <horizontal-slider
                             :items="processToHorizontalSlider(comics)"
@@ -25,7 +25,7 @@
                         ></horizontal-slider>
                     </div>
                 </mq-responsive>
-                <mq-responsive target="md+" tag="span">
+                <mq-responsive target="md+" tag="span"> -->
                     <div>
                         <grid
                             :items="processToHorizontalSlider(comics)"
@@ -34,7 +34,7 @@
                             @nextPage="nextPage"
                         ></grid>
                     </div>
-                </mq-responsive>
+                <!-- </mq-responsive> -->
             </div>
         </div>
     </app-layout>

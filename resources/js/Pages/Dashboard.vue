@@ -21,7 +21,7 @@
             <div class="px-5 py-5 bg-gradient-to-t  to-indigo-900 from-purple-900">
                 <div class="mb-3 text-white">
                     <div>
-                        <div class="text-white float-right">More</div>
+                        <Link class="text-white float-right" :href="route('web.comics', {type: 'newest'})">More</Link>
                         <div>New Releases</div>
                     </div>
                     <mq-responsive target="sm-" tag="span">
@@ -47,7 +47,7 @@
                 </div>
                 <div class="mb-3 text-white">
                     <div>
-                        <div class="text-white float-right">More</div>
+                        <Link class="text-white float-right" :href="route('web.comics', {type: 'popular'})">More</Link>
                         <div>Popular</div>
                     </div>
                     <mq-responsive target="sm-" tag="span">
@@ -71,9 +71,35 @@
                         </div>
                     </mq-responsive>
                 </div>
+                <div class="mb-3 text-white">
+                    <div>
+                        <Link class="text-white float-right" :href="route('web.comics', {type: 'recommended'})">More</Link>
+                        <div>Recommended for you</div>
+                    </div>
+                    <mq-responsive target="sm-" tag="span">
+                        <div>
+                            <horizontal-slider
+                                :items="processToHorizontalSlider(comics.recommended)"
+                                :config="config"
+                                objectCategory="recommended"
+                                @nextPage="nextPage"
+                            ></horizontal-slider>
+                        </div>
+                    </mq-responsive>
+                    <mq-responsive target="md+" tag="span">
+                        <div>
+                            <grid
+                                :items="processToHorizontalSlider(comics.recommended)"
+                                :config="config"
+                                objectCategory="recommended"
+                                @nextPage="nextPage"
+                            ></grid>
+                        </div>
+                    </mq-responsive>
+                </div>
                 <div class="mb-3 text-white" v-for="(tag, idx) in shownTags" :key="'tag-' + idx">
                     <div>
-                        <div class="text-white float-right">More</div>
+                        <Link class="text-white float-right" :href="route('web.comics', {type: 'tag', value: tag.toLowerCase()})">More</Link>
                         <div>{{tag}}</div>
                     </div>
                     <mq-responsive target="sm-" tag="span">
@@ -155,6 +181,7 @@ export default {
             this.getComics(route('api.comics.list', {...this.query, where_tag: elem}), elem)
         })
         this.getComics(route('api.comics.list', {...this.query, sort_by_popular: 1}), 'popular')
+        this.getComics(route('api.comics.list', {...this.query, recommended_comics: 1}), 'recommended')
         this.getComics(route('api.comics.list', this.query), 'all')
         this.getAuthors(route('api.authors.list', this.query), 'all')
     },
@@ -175,6 +202,9 @@ export default {
                     comics: []
                 },
                 popular: {
+                    comics: []
+                },
+                recommended: {
                     comics: []
                 }
             },
