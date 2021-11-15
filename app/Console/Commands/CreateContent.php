@@ -7,6 +7,7 @@ use App\Models\Chapter;
 use App\Models\ChapterPreview;
 use App\Models\Comic;
 use App\Models\Page;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
@@ -60,6 +61,7 @@ class CreateContent extends Command
             public_path('storage/media/covers/4.jpg'),
         ];
 
+
         foreach($coversSource as $idx => $cover){
             File::copy($coversSource[$idx], $coversTarget[$idx]);
         }
@@ -84,15 +86,28 @@ class CreateContent extends Command
         //Create comic
         $this->comic = Comic::create([
             'title' => 'Kara Guardian of Realms',
-            'description' => 'To be added later',
+            'description' => 'Kara Guardian of Realms',
             'tags' => json_encode(['visi8-original', 'kids']),
             'genres' => json_encode(['fantasy', 'sci-fi']),
             'cover_url' => '/storage/media/covers/kara.jpg',
-            'release_date' => now()
+            'release_date' => now(),
+            'author_split' => json_encode([$author->id => 1])
         ]);
         $this->comic->authors()->sync([$author->id]);
 
         $this->sceneStub = file_get_contents(base_path('storage/content/stubs/Scene.html.stub'));
+
+        $bannerSource = storage_path('content/banners/1.png');
+        $bannerTarget = public_path('storage/media/banners/1.png');
+        File::copy($bannerSource, $bannerTarget);
+        Setting::setValue('dashboard.banners', [[
+            'title' => 'kara_banner',
+            'route' => [
+                'name' => 'web.comic',
+                'params' => ['comic' => $this->comic->id]
+            ],
+            'image' => 'storage/media/banners/1.png'
+        ]]);
 
         for($x = 0; $x <= 20; $x++){
             $this->createChapter($x);

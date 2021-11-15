@@ -35,9 +35,9 @@ Route::get('/testing', [ViewController::class, 'viewTesting'])->name('web.testin
 
 Route::get('/', [ViewController::class, 'viewDashboard'])->name('web.dashboard');
 Route::middleware('auth:sanctum')->group(function(){
-    Route::get('/comics/{type}/{value?}', [ViewController::class, 'viewComicsShow'])->name('web.comics');
-    Route::get('/comic/{comic}', [ViewController::class, 'viewComicShow'])->name('web.comic');
-    Route::get('/chapter/{comic}/{chapter}', [ViewController::class, 'viewChapterShow'])->name('web.chapter');
+    // Route::get('/comics/{type}/{value?}', [ViewController::class, 'viewComicsShow'])->name('web.comics');
+    // Route::get('/comic/{comic}', [ViewController::class, 'viewComicShow'])->name('web.comic');
+    // Route::get('/chapter/{comic}/{chapter}', [ViewController::class, 'viewChapterShow'])->name('web.chapter');
     Route::get('/tokens/purchase', [ViewController::class, 'viewPurchaseTokens'])->name('web.purchasetokens');
     Route::get('/payment', [ViewController::class, 'viewPaymentShow'])->name('web.payment');
     Route::get('/my-comics', [ViewController::class, 'viewMyComicShow'])->name('web.mycomics');
@@ -45,6 +45,10 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/my-tokens', [ViewController::class, 'viewMyTokensShow'])->name('web.mytokens');
     Route::get('/my-transactions', [ViewController::class, 'viewMyTransactionsShow'])->name('web.mytransactions');
 });
+
+Route::get('/comics/{type}/{value?}', [ViewController::class, 'viewComicsShow'])->name('web.comics');
+Route::get('/comic/{comic}', [ViewController::class, 'viewComicShow'])->name('web.comic');
+Route::get('/chapter/{comic}/{chapter}', [ViewController::class, 'viewChapterShow'])->name('web.chapter');
 
 Route::get('/about', [ViewController::class, 'viewAboutShow'])->name('web.aboutus');
 Route::get('/scene/{page}', [ViewController::class, 'viewSceneShow'])->name('web.scene');

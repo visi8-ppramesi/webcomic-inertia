@@ -202,7 +202,7 @@ export default {
             this.bookmark = response.data
         })
         this.chapters = this.comic.chapters
-        console.log(JSON.parse(this.user.favorites))
+        // console.log(JSON.parse(this.user.favorites))
         this.subscribed = _.includes(JSON.parse(this.user.subscriptions).map(x => +x), this.comic.id)
         let favObj = JSON.parse(this.user.favorites)
         this.favorited = _.includes(favObj['comics'].map(x => +x), this.comic.id)
@@ -285,7 +285,8 @@ export default {
             }
         },
         checkChapterUnpurchased(chapters, chapter){
-            return !_.includes(chapters, chapter.id) && chapter.token_price != 0
+            return false
+            // return !_.includes(chapters, chapter.id) && chapter.token_price != 0
         },
         addToCart(){
             let cart = JSON.parse(localStorage.getItem('cart') || '{}')
@@ -366,7 +367,8 @@ export default {
             // }})
         },
         checkArPuchased(chapter){
-            return !_.isEmpty(this.purchaseObj) && this.purchaseObj.ar.map(x => +x).includes(chapter)
+            return true
+            // return !_.isEmpty(this.purchaseObj) && this.purchaseObj.ar.map(x => +x).includes(chapter)
         },
         purchaseChapter(){
             axios.post(route('api.chapter.purchase'), {

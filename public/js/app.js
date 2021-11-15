@@ -20982,8 +20982,8 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     }).then(function (response) {
       _this.bookmark = response.data;
     });
-    this.chapters = this.comic.chapters;
-    console.log(JSON.parse(this.user.favorites));
+    this.chapters = this.comic.chapters; // console.log(JSON.parse(this.user.favorites))
+
     this.subscribed = _.includes(JSON.parse(this.user.subscriptions).map(function (x) {
       return +x;
     }), this.comic.id);
@@ -21090,7 +21090,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     checkChapterUnpurchased: function checkChapterUnpurchased(chapters, chapter) {
-      return !_.includes(chapters, chapter.id) && chapter.token_price != 0;
+      return false; // return !_.includes(chapters, chapter.id) && chapter.token_price != 0
     },
     addToCart: function addToCart() {
       var cart = JSON.parse(localStorage.getItem('cart') || '{}');
@@ -21189,9 +21189,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
     },
     checkArPuchased: function checkArPuchased(chapter) {
-      return !_.isEmpty(this.purchaseObj) && this.purchaseObj.ar.map(function (x) {
-        return +x;
-      }).includes(chapter);
+      return true; // return !_.isEmpty(this.purchaseObj) && this.purchaseObj.ar.map(x => +x).includes(chapter)
     },
     purchaseChapter: function purchaseChapter() {
       var _this8 = this;

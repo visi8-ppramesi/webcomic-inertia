@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Comic;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Console\Command;
@@ -53,6 +54,9 @@ class AggregatePopular extends Command
             return $acc;
         }, []);
         arsort($popularComics);
+        if(count($popularComics) < 1){
+            $popularComics = Comic::inRandomOrder()->take(50)->get()->pluck('id')->toArray();
+        }
         $popularComics = array_slice(array_keys($popularComics), 0, 50);
         Setting::setValue('dashboard.popular_comics', $popularComics);
         $this->info('Popular comics updated!');

@@ -31,7 +31,6 @@ class AggregateNearestNeighbors extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->comics = Comic::get()->pluck('id')->toArray();
     }
 
     /**
@@ -42,6 +41,7 @@ class AggregateNearestNeighbors extends Command
     public function handle()
     {
         $u = User::get();
+        $this->comics = Comic::get()->pluck('id')->toArray();
         $closestNeighbors = [];
         for($i = 0; $i < count($u); $i++){
             $myDistances = [];

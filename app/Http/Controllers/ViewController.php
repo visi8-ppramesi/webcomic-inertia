@@ -138,6 +138,12 @@ class ViewController extends Controller
 
     public function viewComicShow(Comic $comic){
         $u = auth()->user();
+        if(empty($u)){
+            $u = [
+                'favorites' => "{\"comics\": [], \"chapters\": []}",
+                'subscriptions' => "[]"
+            ];
+        }
         $comic->increment('views');
         $comic->load(['chapters', 'authors']);
 
