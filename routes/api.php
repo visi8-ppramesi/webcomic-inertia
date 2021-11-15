@@ -73,7 +73,6 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('/user/favorites', [ComicController::class, 'getFavorites'])->name('api.user.show.favorites');
 
     Route::get('/comic/bookmark/check/{comic}', [ComicController::class, 'checkBookmarked'])->name('api.comic.check.bookmark');
-    Route::get('/comic/purchased/check/{comic}', [ComicController::class, 'checkPurchased'])->name('api.comic.check.purchased');
     Route::post('/comics/purchase', [ComicController::class, 'purchaseComics'])->name('api.comics.purchase');
     Route::post('/chapter/purchase', [ChapterController::class, 'purchaseChapter'])->name('api.chapter.purchase');
     Route::get('/previews/{comic}', [ChapterController::class, 'index'])->name('api.comic.get.previews');
@@ -94,6 +93,7 @@ Route::get('/comics', [ComicController::class, 'index'])->name('api.comics.list'
 
 // Route::get('/pages', [PageController::class, 'index'])->name('api.');
 
+Route::get('/comic/purchased/check/{comic}', [ComicController::class, 'checkPurchased'])->name('api.comic.check.purchased');
 Route::get('/author/{author}', [AuthorController::class, 'show'])->name('api.author.show');
 Route::get('/authors', [AuthorController::class, 'index'])->name('api.authors.list');
 Route::get('/chapter/checkar/{chapter}', [ChapterController::class, 'checkAr'])->name('api.chapter.check.ar');

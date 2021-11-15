@@ -91,7 +91,8 @@ class CreateContent extends Command
             'genres' => json_encode(['fantasy', 'sci-fi']),
             'cover_url' => '/storage/media/covers/kara.jpg',
             'release_date' => now(),
-            'author_split' => json_encode([$author->id => 1])
+            'author_split' => json_encode([$author->id => 1]),
+            'is_draft' => 0,
         ]);
         $this->comic->authors()->sync([$author->id]);
 
@@ -156,8 +157,8 @@ class CreateContent extends Command
             'comic_id' => $this->comic->id,
             'chapter' => $cpt,
             'release_date' => now(),
-            'token_price' => 10,
-            'token_price_ar' => 15,
+            'token_price' => 0,
+            'token_price_ar' => 0,
         ]);
         foreach($cptZeroFiles as $file){
             $pathName = $file->getPathname();

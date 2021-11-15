@@ -22735,6 +22735,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   name: 'scene-show',
+  props: ['scene', 'config'],
   data: function data() {
     return {
       origHtmlClass: ''
@@ -22746,16 +22747,16 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   created: function created() {
-    var _this = this;
-
-    axios.get(route('api.page.show.scene', {
-      page: this.$route.params.pageId
-    })).then(function (response) {
-      var html = document.getElementsByTagName('html')[0];
-      _this.origHtmlClass = html.className;
-      document.body.insertAdjacentHTML('beforeend', response.data.scene);
-      window.addEventListener('xrloaded', _this.onXrLoaded);
-    });
+    var html = document.getElementsByTagName('html')[0];
+    this.origHtmlClass = html.className;
+    document.body.insertAdjacentHTML('beforeend', this.scene);
+    window.addEventListener('xrloaded', this.onXrLoaded); // axios.get(route('api.page.show.scene', {page: this.$route.params.pageId}))
+    // .then((response) => {
+    //     const html = document.getElementsByTagName('html')[0]
+    //     this.origHtmlClass = html.className
+    //     document.body.insertAdjacentHTML('beforeend', response.data.scene)
+    //     window.addEventListener('xrloaded', this.onXrLoaded)
+    // })
   },
   beforeDestroy: function beforeDestroy() {
     var ascene = document.getElementsByTagName('a-scene')[0];

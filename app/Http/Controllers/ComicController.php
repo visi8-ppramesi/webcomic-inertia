@@ -52,6 +52,9 @@ class ComicController extends Controller
 
     public function checkPurchased(Comic $comic){
         $u = auth()->user();
+        if(empty($u)){
+            return [];
+        }
         return response()->json($u->checkComicPurchased($comic->id), 200);
     }
 

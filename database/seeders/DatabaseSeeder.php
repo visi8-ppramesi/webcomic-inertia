@@ -37,6 +37,9 @@ class DatabaseSeeder extends Seeder
         Page::factory(4000)->create();
         echo 'factory finished' . PHP_EOL;
 
+        $tags = Tag::inRandomOrder()->take(3)->get()->pluck('name')->toArray();
+        Setting::setValue('dashboard.tags', $tags);
+
         foreach(Comic::get() as $idx => $comic){
             $authors = Author::inRandomOrder()->limit(2)->get()->pluck('id');
 

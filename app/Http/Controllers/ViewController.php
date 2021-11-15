@@ -168,6 +168,32 @@ class ViewController extends Controller
         // $pages = Page::where('chapter_id', $chapter->id);
         $u = auth()->user();
         $comic->load('chapters');
+        if(empty($u)){
+            if($chapter->token_price == 0){
+                $chapter->increment('views');
+                $comments = $chapter->commentsWithChildrenAndCommenter()->parentless()->get()->injectCanDelete()->injectUserLiked();
+
+                $pages = $chapter->pages;
+                foreach($pages as $idx => $page){
+                    $pages[$idx]['image_url'] = $page->getSignedImageUrl();
+                }
+
+                $param = [
+                    'comic' => $comic,
+                    'chapter' => $chapter,
+                    // 'pages' => $chapter->pages,
+                    'pages' => $pages,
+                    'comment_key' => $chapter->getEncryptedKey(),
+                    'comments' => $comments
+                ];
+                if(request()->has('ar')){
+                    $param['ar'] = request('ar');
+                };
+                return Inertia::render('PageShow', $param);
+            }else{
+                return Redirect::route('web.comic', ['comic' => $chapter->comic->id, 'error' => 'unpurchased']);
+            }
+        }
         if($u->checkChapterPurchased($chapter->id)){
             $u->readComic($comic->id, $chapter->id);
             $chapter->increment('views');
