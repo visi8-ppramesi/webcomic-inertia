@@ -3,7 +3,7 @@
         <div class="mb-3 text-white">
             <div class="px-5 py-5">
                 <div>
-                    <div>Popular</div>
+                    <div>{{title}}</div>
                 </div>
                 <grid
                     :items="processItems(comics.all)"
