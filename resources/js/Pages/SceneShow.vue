@@ -33,7 +33,7 @@ export default {
         //     window.addEventListener('xrloaded', this.onXrLoaded)
         // })
     },
-    beforeDestroy(){
+    beforeUnmount(){
         const ascene = document.getElementsByTagName('a-scene')[0]
         ascene.parentNode.removeChild(ascene)
         const eightWallLoading = document.getElementById('loadingContainer')
